@@ -9,9 +9,9 @@ export const metadata: Metadata = {
   description:
     "Learn SQL by seeing how your queries process data step by step. Query-to-Visual Explanation platform for university students.",
   icons: {
-    icon: "/sqlens-icon.png",
-    shortcut: "/sqlens-icon.png",
-    apple: "/sqlens-icon.png",
+    icon: "/icon-sqlens.png",
+    shortcut: "/icon-sqlens.png",
+    apple: "/icon-sqlens.png",
   },
   keywords: [
     "SQL",
