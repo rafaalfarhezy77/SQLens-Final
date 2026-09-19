@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sqlens.web.id/sitemap.xml
