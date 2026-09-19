@@ -64,3 +64,4 @@ desktop.ini
 # AGENT / TOOLING LOCAL METADATA
 # ==============================================================================
 .agents/
+.github/
