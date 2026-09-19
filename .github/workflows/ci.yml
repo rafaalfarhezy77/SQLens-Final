@@ -1,0 +1,43 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sqlens-frontend/package-lock.json
+      - name: Install dependencies
+        working-directory: sqlens-frontend
+        run: npm ci
+      - name: TypeScript
+        working-directory: sqlens-frontend
+        run: npm run typecheck
+      - name: Biome lint
+        working-directory: sqlens-frontend
+        run: npm run check
+      - name: Tests and coverage
+        working-directory: sqlens-frontend
+        run: npm run test:coverage
+      - name: Production build
+        working-directory: sqlens-frontend
+        run: npm run build
+      - name: SonarQube scan
+        if: ${{ secrets.SONAR_TOKEN != '' && secrets.SONAR_HOST_URL != '' }}
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          projectBaseDir: sqlens-frontend

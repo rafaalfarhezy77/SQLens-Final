@@ -1,0 +1,66 @@
+# ==============================================================================
+# SENSITIVE / SECRETS - JANGAN PERNAH DI-COMMIT / DI-UPLOAD KE GITHUB
+# ==============================================================================
+.env
+.env.local
+.env.*.local
+*.env
+*.key
+*.pem
+*.cert
+!.env.example
+
+# ==============================================================================
+# DEPENDENCIES - JANGAN DI-UPLOAD (Bisa di-install ulang lewat package manager)
+# ==============================================================================
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# ==============================================================================
+# BUILD OUTPUTS & CACHE - JANGAN DI-UPLOAD
+# ==============================================================================
+# Next.js build
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# Test & coverage
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+.mypy_cache/
+.ruff_cache/
+
+# ==============================================================================
+# OS & IDE FILES
+# ==============================================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ==============================================================================
+# AGENT / TOOLING LOCAL METADATA
+# ==============================================================================
+.agents/
