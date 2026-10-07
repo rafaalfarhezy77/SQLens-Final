@@ -26,6 +26,9 @@ export async function askAiTutor(
         body: JSON.stringify({
           model,
           response_format: { type: "json_object" },
+          provider: {
+            sort: "throughput",
+          },
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: prompt.slice(0, 2_000) },
