@@ -41,7 +41,7 @@ export async function askAiTutor(
       },
       body: JSON.stringify(requestBody),
       cache: "no-store",
-      signal: AbortSignal.timeout(12_000),
+      signal: AbortSignal.timeout(25_000),
     });
     const body: unknown = await upstream.json().catch(() => null);
     const content =
@@ -51,7 +51,14 @@ export async function askAiTutor(
         : undefined;
     if (!upstream.ok || typeof content !== "string")
       return { error: "AI Tutor tidak dapat merespons saat ini." };
-    const parsedJson: unknown = JSON.parse(content);
+
+    // Bersihkan format markdown jika model membungkusnya dengan ```json ... ```
+    let cleanJson = content.trim();
+    if (cleanJson.startsWith("```")) {
+      cleanJson = cleanJson.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+    }
+
+    const parsedJson: unknown = JSON.parse(cleanJson);
     const parsed = aiTutorResponseSchema.safeParse(parsedJson);
     return parsed.success
       ? { response: parsed.data }
