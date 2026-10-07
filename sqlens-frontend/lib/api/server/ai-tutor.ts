@@ -14,30 +14,35 @@ export async function askAiTutor(
   const model = process.env.SQLENS_AI_MODEL;
   if (!apiKey || !model)
     return { error: "AI Tutor belum dikonfigurasi oleh server." };
+  const endpoint =
+    process.env.SQLENS_AI_BASE_URL ||
+    "https://openrouter.ai/api/v1/chat/completions";
+  const isOpenRouter = endpoint.includes("openrouter.ai");
+
   try {
-    const upstream = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model,
-          response_format: { type: "json_object" },
-          provider: {
-            sort: "throughput",
-          },
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: prompt.slice(0, 2_000) },
-          ],
-        }),
-        cache: "no-store",
-        signal: AbortSignal.timeout(12_000),
+    const requestBody: Record<string, unknown> = {
+      model,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: prompt.slice(0, 2_000) },
+      ],
+    };
+
+    if (isOpenRouter) {
+      requestBody.provider = { sort: "throughput" };
+    }
+
+    const upstream = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify(requestBody),
+      cache: "no-store",
+      signal: AbortSignal.timeout(12_000),
+    });
     const body: unknown = await upstream.json().catch(() => null);
     const content =
       typeof body === "object" && body !== null
