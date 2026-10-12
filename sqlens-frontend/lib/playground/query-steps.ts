@@ -28,7 +28,11 @@ export interface QueryStep {
   rowsBeforeCount: number;
   rowsAfterCount: number;
   rowEvaluations: StepRowItem[];
-  joinDetails?: JoinVisualizationDetails;
+  joinDetails?: JoinVisualizationDetails | null;
+  nodeId?: string | null;
+  nodeType?: string | null;
+  parentIds?: string[] | null;
+  operationExpression?: string | null;
 }
 
 export interface PipelineSimulationResult {

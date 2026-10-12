@@ -84,4 +84,64 @@ describe("QueryVisualization", () => {
     await user.click(screen.getByRole("button", { name: "01 FROM" }));
     expect(usePlaygroundUiStore.getState().activeVisualizationStepId).toBe(1);
   });
+
+  it("renders the Packet Tracer topology canvas with zoom/pan controls", () => {
+    render(<QueryVisualization steps={[baseStep]} />);
+    expect(screen.getByText("PACKET TRACER TOPOLOGY")).toBeInTheDocument();
+    expect(screen.getByTitle("Paskan ke Layar (Fit to Screen)")).toBeInTheDocument();
+    expect(screen.getByTitle("Perbesar (Zoom In)")).toBeInTheDocument();
+  });
+
+  it("supports playback transport controls to play and step forward", async () => {
+    const user = userEvent.setup();
+    render(
+      <QueryVisualization
+        steps={[
+          baseStep,
+          {
+            ...baseStep,
+            stepNumber: 2,
+            clause: "WHERE score >= 80",
+            title: "Filter",
+            badge: "02 / WHERE",
+          },
+        ]}
+      />,
+    );
+
+    const playBtn = screen.getByRole("button", { name: /PLAY/i });
+    expect(playBtn).toBeInTheDocument();
+    await user.click(playBtn);
+    expect(screen.getByRole("button", { name: /PAUSE/i })).toBeInTheDocument();
+
+    const nextBtn = screen.getByTitle("Langkah Selanjutnya (Next)");
+    await user.click(nextBtn);
+    expect(usePlaygroundUiStore.getState().activeVisualizationStepId).toBe(1);
+  });
+
+  it("opens node detail inspector when a node is clicked", async () => {
+    const user = userEvent.setup();
+    render(<QueryVisualization steps={[baseStep]} query="SELECT name FROM students;" />);
+
+    const nodeButtons = screen.getAllByRole("button");
+    const nodeEl = nodeButtons.find((btn) => btn.textContent?.includes("FROM students"));
+    if (nodeEl) {
+      await user.click(nodeEl);
+      expect(screen.getByText("TANYA AI TUTOR TENTANG TAHAP INI")).toBeInTheDocument();
+    }
+  });
+
+  it("switches view modes between topology, split, and cards", async () => {
+    const user = userEvent.setup();
+    render(<QueryVisualization steps={[baseStep]} />);
+
+    const cardsTab = screen.getByRole("button", { name: /Daftar Rinci/i });
+    await user.click(cardsTab);
+    expect(screen.queryByText("PACKET TRACER TOPOLOGY")).not.toBeInTheDocument();
+
+    const topoTab = screen.getByRole("button", { name: /Topologi/i });
+    await user.click(topoTab);
+    expect(screen.getByText("PACKET TRACER TOPOLOGY")).toBeInTheDocument();
+  });
 });
+

@@ -9,6 +9,12 @@ export interface PlaygroundUiState {
    */
   activeVisualizationStepId: number | null;
   setActiveVisualizationStepId: (stepId: number | null) => void;
+  selectedNodeId: string | null;
+  setSelectedNodeId: (nodeId: string | null) => void;
+  playbackState: { isPlaying: boolean; speedMs: number };
+  setPlaybackState: (state: Partial<{ isPlaying: boolean; speedMs: number }>) => void;
+  visualizationViewMode: "graph" | "cards";
+  setVisualizationViewMode: (mode: "graph" | "cards") => void;
 }
 
 /**
@@ -19,4 +25,11 @@ export const usePlaygroundUiStore = create<PlaygroundUiState>((set) => ({
   activeVisualizationStepId: null,
   setActiveVisualizationStepId: (stepId) =>
     set({ activeVisualizationStepId: stepId }),
+  selectedNodeId: null,
+  setSelectedNodeId: (nodeId) => set({ selectedNodeId: nodeId }),
+  playbackState: { isPlaying: false, speedMs: 1600 },
+  setPlaybackState: (patch) =>
+    set((state) => ({ playbackState: { ...state.playbackState, ...patch } })),
+  visualizationViewMode: "graph",
+  setVisualizationViewMode: (mode) => set({ visualizationViewMode: mode }),
 }));
