@@ -43,6 +43,33 @@ def bootstrap() -> None:
           (104, 4, 'Basis Data', 65, 'C')
         ON CONFLICT (id) DO NOTHING
         """,
+        """
+        CREATE TABLE IF NOT EXISTS courses (
+          code VARCHAR(20) PRIMARY KEY,
+          title VARCHAR(255) NOT NULL,
+          credits INTEGER NOT NULL
+        )
+        """,
+        """
+        INSERT INTO courses (code, title, credits) VALUES
+          ('CS101', 'Basis Data', 3),
+          ('CS102', 'Algoritma', 4),
+          ('IS201', 'Sistem Informasi Manajemen', 3),
+          ('CE301', 'Arsitektur Komputer', 3)
+        ON CONFLICT (code) DO NOTHING
+        """,
+        """
+        CREATE OR REPLACE VIEW mahasiswa AS 
+        SELECT id, name AS nama, major AS jurusan FROM students
+        """,
+        """
+        CREATE OR REPLACE VIEW nilai AS 
+        SELECT id, student_id AS mahasiswa_id, course AS matakuliah, score AS nilai, grade FROM scores
+        """,
+        """
+        CREATE OR REPLACE VIEW matakuliah AS 
+        SELECT code AS kode, title AS nama_mata_kuliah, credits AS sks FROM courses
+        """,
     ]
 
     with engine.begin() as connection:
