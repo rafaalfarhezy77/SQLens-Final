@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { updateProfileAction } from "@/lib/auth/actions";
 
 export function ProfileCard({
   user,
@@ -10,7 +11,11 @@ export function ProfileCard({
   user: { name: string; email: string; role: "mahasiswa" | "dosen" };
 }) {
   const [name, setName] = useState(user.name);
-  const [message, setMessage] = useState<string | null>(null);
+  const [state, formAction, isPending] = useActionState(
+    updateProfileAction,
+    { success: false, message: "" },
+  );
+
   return (
     <section
       aria-labelledby="profile-heading"
@@ -47,15 +52,7 @@ export function ProfileCard({
           </dd>
         </div>
       </dl>
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          setMessage(
-            "Perubahan profil belum dapat dikirim: endpoint profil BFF belum tersedia.",
-          );
-        }}
-        className="space-y-3 pt-2"
-      >
+      <form action={formAction} className="space-y-3 pt-2">
         <div className="space-y-1.5">
           <label
             htmlFor="profile-name"
@@ -65,24 +62,28 @@ export function ProfileCard({
           </label>
           <Input
             id="profile-name"
+            name="name"
             value={name}
             onChange={(event) => setName(event.target.value)}
             required
             minLength={2}
           />
         </div>
-        <Button type="submit" size="sm">
-          Simpan Perubahan
+        <Button type="submit" size="sm" disabled={isPending}>
+          {isPending ? "Menyimpan..." : "Simpan Perubahan"}
         </Button>
-        {message ? (
+        {state.message ? (
           <p
             role="status"
-            className="p-3 bg-[#FFF3A3] border-2 border-[#111111] text-xs font-mono font-medium shadow-[2px_2px_0px_0px_#111111]"
+            className={`p-3 border-2 border-[#111111] text-xs font-mono font-medium shadow-[2px_2px_0px_0px_#111111] ${
+              state.success ? "bg-[#E8F8F0] text-[#006633]" : "bg-[#FFF3A3] text-[#111111]"
+            }`}
           >
-            {message}
+            {state.message}
           </p>
         ) : null}
       </form>
     </section>
   );
 }
+

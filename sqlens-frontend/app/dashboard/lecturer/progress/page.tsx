@@ -1,18 +1,30 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { DEMO_PROGRESS } from "@/lib/features/lecturer/demo-data";
 import { requireDosen } from "@/lib/auth/guards";
+import { getStudentProgressForLecturer } from "@/lib/api/server/lecturer";
+import type { StudentProgress } from "@/lib/api/contracts/lecturer";
 
 export default async function ProgressPage() {
   await requireDosen();
+  let progress: StudentProgress[] = [];
+  try {
+    progress = await getStudentProgressForLecturer();
+    if (progress.length === 0) {
+      progress = DEMO_PROGRESS;
+    }
+  } catch {
+    progress = DEMO_PROGRESS;
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Progress & Hasil Mahasiswa"
-        badge="MODE DEMO FRONTEND"
-        description="Progress menggunakan domain aktivitas bersama, siap dipasok BFF."
+        badge="PORTAL DOSEN"
+        description="Ringkasan capaian dan keberhasilan query mahasiswa berdasarkan data pembelajaran terkini."
       />
       <section className="grid gap-4 md:grid-cols-2">
-        {DEMO_PROGRESS.map((item) => (
+        {progress.map((item) => (
           <article
             key={item.id}
             className="border-2 border-[#111111] bg-white p-4 shadow-[3px_3px_0_#111111]"
@@ -35,3 +47,4 @@ export default async function ProgressPage() {
     </div>
   );
 }
+

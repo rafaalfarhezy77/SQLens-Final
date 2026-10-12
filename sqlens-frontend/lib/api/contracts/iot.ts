@@ -7,7 +7,7 @@ export const iotReadingSchema = z
     sensorType: z.string(),
     value: z.number().finite(),
     unit: z.string(),
-    recordedAt: z.string().datetime(),
+    recordedAt: z.string().datetime({ offset: true }),
     status: z.enum(["normal", "warning", "offline"]),
   })
   .strict();

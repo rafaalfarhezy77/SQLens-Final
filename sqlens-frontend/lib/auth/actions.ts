@@ -9,9 +9,14 @@ import {
 import {
   createSession,
   destroySession,
+  getSession,
   isSessionSigningConfigured,
 } from "./session";
-import { authenticateWithBackend } from "@/lib/api/server/auth";
+import {
+  authenticateWithBackend,
+  updateUserProfileOnBackend,
+} from "@/lib/api/server/auth";
+
 
 /**
  * Server Action untuk memproses login mahasiswa/pengguna.
@@ -141,3 +146,33 @@ export async function logoutAction(): Promise<void> {
   await destroySession();
   redirect("/login");
 }
+
+export async function updateProfileAction(
+  _prevState: { success?: boolean; message?: string },
+  formData: FormData,
+): Promise<{ success: boolean; message: string }> {
+  const name = formData.get("name")?.toString().trim() || "";
+  if (name.length < 2) {
+    return { success: false, message: "Nama minimal 2 karakter." };
+  }
+  if (name.length > 120) {
+    return { success: false, message: "Nama maksimal 120 karakter." };
+  }
+
+  const currentSession = await getSession();
+  if (!currentSession) {
+    return { success: false, message: "Sesi tidak ditemukan. Silakan login kembali." };
+  }
+
+  const result = await updateUserProfileOnBackend(name);
+  if (!result.user || result.error) {
+    return { success: false, message: result.error || "Gagal memperbarui profil." };
+  }
+
+  await createSession({
+    ...result.user,
+  });
+
+  return { success: true, message: "Profil berhasil diperbarui!" };
+}
+

@@ -63,3 +63,31 @@ export async function authenticateWithBackend(
     };
   }
 }
+
+export async function updateUserProfileOnBackend(
+  name: string,
+): Promise<{ user?: AuthenticatedUser; error?: string }> {
+  const { callAuthenticatedFastApi } = await import("@/lib/api/server/fastapi-client");
+  try {
+    const response = await callAuthenticatedFastApi("/v1/auth/profile", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name }),
+    });
+
+    if (!response.ok) {
+      return { error: "Gagal memperbarui profil di server." };
+    }
+
+    const parsed = authenticatedUserSchema.safeParse(response.body);
+    if (!parsed.success) {
+      return { error: "Format respons profil tidak valid." };
+    }
+    return { user: parsed.data };
+  } catch (err: unknown) {
+    return { error: err instanceof Error ? err.message : "Terjadi kesalahan saat memperbarui profil." };
+  }
+}
+

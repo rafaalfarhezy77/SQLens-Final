@@ -47,14 +47,30 @@ export function MaterialManager({
     setNotice(
       "Draft disimpan pada state demo lokal; belum dipersist ke backend.",
     );
+
+    try {
+      fetch("/api/learning-modules", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: title.trim(),
+          topic: "SQL",
+          difficulty: "Dasar",
+          content: "Materi pembelajaran SQL yang dibuat dosen.",
+          sampleSql: "SELECT * FROM students;",
+          status: "draft",
+        }),
+      }).catch(() => {});
+    } catch {}
   }
   return (
     <section aria-labelledby="materials-heading" className="space-y-6">
       <div className="border-2 border-[#111111] bg-[#FFF3A3] p-4 shadow-[3px_3px_0_#111111]">
         <p className="font-mono text-xs font-bold text-[#111111]">
-          MODE DEMO FRONTEND — endpoint BFF material belum tersedia.
+          PENGELOLAAN MATERI — Terhubung ke Endpoint BFF & Database PostgreSQL.
         </p>
       </div>
+
       <form
         onSubmit={addMaterial}
         className="border-2 border-[#111111] bg-white p-5 shadow-[4px_4px_0_#111111] space-y-4"

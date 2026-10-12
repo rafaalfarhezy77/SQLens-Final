@@ -1,22 +1,28 @@
 import { PageHeader } from "@/components/layout/page-header";
-import { DEMO_IOT_READINGS } from "@/lib/features/lecturer/demo-data";
 import { requireSession } from "@/lib/auth/guards";
 import { Badge } from "@/components/ui/badge";
+import { getLatestIoTReadings } from "@/lib/api/server/iot";
 
 export default async function IoTPage() {
   await requireSession();
+  let readings = [];
+  try {
+    readings = await getLatestIoTReadings();
+  } catch (error) {
+    console.error("Failed to load IoT readings:", error);
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Monitoring Data IoT"
-        badge="MODE DEMO FRONTEND"
-        description="Tampilan pembacaan sensor dengan kontrak terketik; bukan koneksi perangkat langsung."
+        badge="TELEMETRI AKTIF"
+        description="Monitoring pembacaan sensor IoT lingkungan pembelajaran dari database dan perangkat live."
       />
-      <div className="border-3 border-[#111111] bg-[#FFF3A3] p-4 shadow-[3px_3px_0_#111111] text-xs font-mono font-bold flex items-center gap-2">
-        <span className="w-2.5 h-2.5 bg-[#FFD600] border border-[#111111] inline-block" />
+      <div className="border-3 border-[#111111] bg-[#D4F4DD] p-4 shadow-[3px_3px_0_#111111] text-xs font-mono font-bold flex items-center gap-2">
+        <span className="w-2.5 h-2.5 bg-[#00A854] border border-[#111111] inline-block" />
         <span>
-          LIVE IOT BELUM TERHUBUNG — fixture development yang diisolasi
-          digunakan untuk memverifikasi UI.
+          PIPELINE IOT AKTIF — Data telemetri sensor terhubung ke backend FastAPI dan PostgreSQL.
         </span>
       </div>
       <section className="overflow-x-auto border-3 border-[#111111] shadow-[5px_5px_0_#111111] bg-white">
@@ -39,32 +45,40 @@ export default async function IoTPage() {
             </tr>
           </thead>
           <tbody className="divide-y border-[#111111]">
-            {DEMO_IOT_READINGS.map((reading) => (
-              <tr
-                key={reading.id}
-                className="hover:bg-[#F7F7F2] transition-colors"
-              >
-                <td className="p-3 font-bold border-r border-[#111111]">
-                  {reading.deviceId}
-                </td>
-                <td className="p-3 border-r border-[#111111]">
-                  {reading.sensorType}
-                </td>
-                <td className="p-3 font-bold border-r border-[#111111]">
-                  {reading.value} {reading.unit}
-                </td>
-                <td className="p-3 border-r border-[#111111] text-[#666666]">
-                  {reading.recordedAt}
-                </td>
-                <td className="p-3">
-                  <Badge
-                    variant={reading.status === "normal" ? "success" : "yellow"}
-                  >
-                    {reading.status.toUpperCase()}
-                  </Badge>
+            {readings.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="p-6 text-center text-[#666666]">
+                  Belum ada data telemetri sensor. Jalankan simulator untuk merekam pembacaan baru.
                 </td>
               </tr>
-            ))}
+            ) : (
+              readings.map((reading) => (
+                <tr
+                  key={reading.id}
+                  className="hover:bg-[#F7F7F2] transition-colors"
+                >
+                  <td className="p-3 font-bold border-r border-[#111111]">
+                    {reading.deviceId}
+                  </td>
+                  <td className="p-3 border-r border-[#111111]">
+                    {reading.sensorType}
+                  </td>
+                  <td className="p-3 font-bold border-r border-[#111111]">
+                    {reading.value} {reading.unit}
+                  </td>
+                  <td className="p-3 border-r border-[#111111] text-[#666666]">
+                    {reading.recordedAt}
+                  </td>
+                  <td className="p-3">
+                    <Badge
+                      variant={reading.status === "normal" ? "success" : "yellow"}
+                    >
+                      {reading.status.toUpperCase()}
+                    </Badge>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </section>
