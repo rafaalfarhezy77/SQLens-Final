@@ -113,7 +113,7 @@ export function AiResponseCard({
           </span>
         </div>
 
-        <h2 className="font-sans text-base sm:text-lg lg:text-xl font-bold leading-snug text-white">
+        <h2 className="font-sans text-base sm:text-lg lg:text-xl font-bold leading-snug text-black">
           &ldquo;{prompt}&rdquo;
         </h2>
 

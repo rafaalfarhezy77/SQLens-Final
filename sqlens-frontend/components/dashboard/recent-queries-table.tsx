@@ -45,6 +45,8 @@ export function RecentQueriesTable({
     },
   ];
 
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const items = initialActivities.length > 0 ? initialActivities : defaultItems;
 
   const filteredItems = items.filter((item) => {
@@ -54,6 +56,9 @@ export function RecentQueriesTable({
       return item.status === "error" || item.status === "warning";
     return true;
   });
+
+  const shouldLimit = !isExpanded && filteredItems.length > 5;
+  const displayedItems = shouldLimit ? filteredItems.slice(0, 5) : filteredItems;
 
   return (
     <section
@@ -129,14 +134,14 @@ export function RecentQueriesTable({
             </tr>
           </thead>
           <tbody className="divide-y-2 divide-[#111111]">
-            {filteredItems.length === 0 ? (
+            {displayedItems.length === 0 ? (
               <tr>
                 <td colSpan={5} className="p-6 text-center text-[#777777]">
                   Tidak ada query yang sesuai dengan filter ini.
                 </td>
               </tr>
             ) : (
-              filteredItems.map((item) => (
+              displayedItems.map((item) => (
                 <tr
                   key={item.id}
                   className="hover:bg-[#FFF3A3]/20 transition-colors"
@@ -178,6 +183,33 @@ export function RecentQueriesTable({
           </tbody>
         </table>
       </div>
+
+      {filteredItems.length > 5 ? (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+          <span className="font-mono text-xs text-[#666666]">
+            {shouldLimit
+              ? `Menampilkan 5 dari ${filteredItems.length} query terbaru`
+              : `Menampilkan semua (${filteredItems.length}) riwayat query`}
+          </span>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/dashboard/query-history"
+              className="inline-flex items-center gap-1.5 border-2 border-[#111111] bg-[#FFD600] px-3.5 py-1.5 text-xs font-black uppercase shadow-[2px_2px_0px_0px_#111111] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all"
+            >
+              Halaman Riwayat Lengkap &rarr;
+            </Link>
+            <button
+              type="button"
+              onClick={() => setIsExpanded((prev) => !prev)}
+              className="inline-flex items-center gap-1.5 border-2 border-[#111111] bg-white px-3.5 py-1.5 text-xs font-bold uppercase shadow-[2px_2px_0px_0px_#111111] hover:bg-[#F7F7F2] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+            >
+              {shouldLimit
+                ? `Lihat Semua (${filteredItems.length})`
+                : "Tampilkan Lebih Sedikit (5)"}
+            </button>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

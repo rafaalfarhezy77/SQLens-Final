@@ -11,6 +11,7 @@ import { QueryVisualization } from "@/components/playground/query-visualization"
 import { DEFAULT_SQL_QUERY } from "@/lib/playground/query-processor";
 import { executeQueryForCurrentUser } from "@/lib/api/server/query-execution";
 import { getEducationalDataset } from "@/lib/api/server/datasets";
+import { BffRequestError } from "@/lib/api/server/errors";
 import type { QueryExecutionSuccessResponse } from "@/lib/api/contracts/query-execution";
 import type { EducationalDataset } from "@/lib/api/contracts/datasets";
 
@@ -43,9 +44,13 @@ export default async function PlaygroundPage({
     } else {
       executionError = response.payload.error.message;
     }
-  } catch {
-    executionError =
-      "Query tidak dapat dijalankan karena layanan SQLens tidak tersedia.";
+  } catch (error) {
+    if (error instanceof BffRequestError) {
+      executionError = error.payload.message;
+    } else {
+      executionError =
+        "Query tidak dapat dijalankan karena layanan SQLens tidak tersedia.";
+    }
   }
 
   return (
@@ -117,11 +122,14 @@ export default async function PlaygroundPage({
       {/* Query-to-Visual Explanation Section (Server Component) */}
       {executionResult && (
         <div className="space-y-4">
-          <QueryVisualization steps={executionResult.steps} />
+          <QueryVisualization
+            steps={executionResult.steps}
+            query={currentQuery}
+          />
         </div>
       )}
 
-      <QueryHistory />
+      <QueryHistory limit={5} showViewAllLink={true} />
     </div>
   );
 }

@@ -33,7 +33,6 @@ const joinVisualizationDetailsSchema = z
   })
   .strict();
 
-/** Mirrors the existing SQLens visual-processing model at the transport boundary. */
 const queryProcessingStepSchema = z
   .object({
     stepNumber: z.number().int().positive(),
@@ -45,7 +44,11 @@ const queryProcessingStepSchema = z
     rowsBeforeCount: z.number().int().nonnegative(),
     rowsAfterCount: z.number().int().nonnegative(),
     rowEvaluations: z.array(queryStepRowSchema),
-    joinDetails: joinVisualizationDetailsSchema.optional(),
+    joinDetails: joinVisualizationDetailsSchema.nullable().optional(),
+    nodeId: z.string().nullable().optional(),
+    nodeType: z.string().nullable().optional(),
+    parentIds: z.array(z.string()).nullable().optional(),
+    operationExpression: z.string().nullable().optional(),
   })
   .strict();
 
