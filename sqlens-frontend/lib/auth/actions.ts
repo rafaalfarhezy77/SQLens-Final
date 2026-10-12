@@ -52,6 +52,7 @@ export async function loginAction(
       success: false,
       message:
         result.error ?? "Email atau kata sandi tidak cocok. Silakan coba lagi.",
+      isWaking: result.isWaking,
       timestamp: Date.now(),
     };
   }
@@ -117,6 +118,7 @@ export async function registerAction(
     return {
       success: false,
       message: result.error ?? "Akun tidak dapat dibuat.",
+      isWaking: result.isWaking,
       timestamp: Date.now(),
     };
   }

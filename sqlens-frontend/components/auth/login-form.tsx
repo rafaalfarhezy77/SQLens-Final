@@ -13,6 +13,7 @@ import {
 import { loginAction } from "@/lib/auth/actions";
 import type { AuthActionState } from "@/lib/schemas/auth";
 import { Input } from "@/components/ui/input";
+import { BackendWakingBanner } from "@/components/auth/backend-waking-banner";
 
 const initialState: AuthActionState = {};
 
@@ -53,8 +54,17 @@ export function LoginForm() {
         </div>
       )}
 
+      {/* Backend Waking Banner with 15s Timer */}
+      {state.message && !state.success && state.isWaking && (
+        <BackendWakingBanner
+          key={state.timestamp ?? "waking-login"}
+          initialSeconds={15}
+          message={state.message}
+        />
+      )}
+
       {/* General Form Error */}
-      {state.message && !state.success && (
+      {state.message && !state.success && !state.isWaking && (
         <div
           role="alert"
           className="p-3.5 bg-red-50 border-2 border-[#111111] shadow-[3px_3px_0px_0px_#111111] text-xs font-mono flex items-start gap-2"

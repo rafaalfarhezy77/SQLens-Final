@@ -47,4 +47,5 @@ export interface AuthActionState {
   message?: string;
   fieldErrors?: Record<string, string[]>;
   timestamp?: number;
+  isWaking?: boolean;
 }
