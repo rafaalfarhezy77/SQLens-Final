@@ -33,3 +33,11 @@ class AuthenticatedUserResponse(BaseModel):
     name: str
     email: str
     role: Role
+
+
+class UpdateProfileRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True, extra="ignore", str_strip_whitespace=True)
+
+    name: str = Field(min_length=2, max_length=120)
+    avatar_url: str | None = Field(default=None, alias="avatarUrl")
+

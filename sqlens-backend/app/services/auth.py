@@ -25,3 +25,13 @@ class AuthService:
         if not user or not verify_password(password, user.password_hash):
             raise PublicApiError(status_code=401, code="INVALID_CREDENTIALS", message="Email atau kata sandi tidak cocok.")
         return user
+
+    def update_profile(self, session: Session, *, user_id: str, name: str) -> User:
+        user = session.scalar(select(User).where(User.id == user_id))
+        if not user:
+            raise PublicApiError(status_code=404, code="USER_NOT_FOUND", message="Pengguna tidak ditemukan.")
+        user.name = name.strip()
+        session.commit()
+        session.refresh(user)
+        return user
+

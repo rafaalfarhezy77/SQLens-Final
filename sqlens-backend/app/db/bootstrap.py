@@ -4,10 +4,11 @@ from sqlalchemy import text
 
 from app.db.base import Base
 from app.db.session import engine
-from app.models import QueryHistory, User  # noqa: F401 - registers model metadata
+from app.models import IoTReading, LearningMaterial, QueryHistory, User  # noqa: F401 - registers model metadata
 
 
 def bootstrap() -> None:
+
     Base.metadata.create_all(bind=engine)
 
     statements = [

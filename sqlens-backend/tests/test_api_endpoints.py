@@ -328,3 +328,143 @@ class TestQueryHistoryEndpoints:
 
         res4 = sync_request("GET", "/v1/query-history", headers=headers)
         assert len(res4["json"]["items"]) == 0
+
+
+class TestProfileEndpoint:
+    def test_update_profile(self) -> None:
+        # FR-03: Kelola Profil
+        unique_email = f"user_prof_{uuid4().hex[:8]}@sqlens.edu"
+        reg_res = sync_request(
+            "POST",
+            "/v1/auth/register",
+            json_data={
+                "name": "Original Name",
+                "email": unique_email,
+                "password": "Password123!",
+                "role": "mahasiswa",
+            },
+        )
+        assert reg_res["status_code"] == 201
+        user_id = reg_res["json"]["id"]
+        headers = make_bff_headers(user_id)
+
+        # 1. Update unauthorized
+        unauth = sync_request("PATCH", "/v1/auth/profile", json_data={"name": "New Name"})
+        assert unauth["status_code"] == 401
+
+        # 2. Update name
+        update_res = sync_request(
+            "PATCH",
+            "/v1/auth/profile",
+            json_data={"name": "Updated Name", "avatarUrl": "https://avatar.example.com/me.png"},
+            headers=headers,
+        )
+        assert update_res["status_code"] == 200
+        assert update_res["json"]["name"] == "Updated Name"
+        assert update_res["json"]["email"] == unique_email
+
+
+class TestMaterialsEndpoints:
+    def test_materials_crud(self) -> None:
+        # FR-16: Mengelola Materi SQL
+        lecturer_id = f"lecturer-{uuid4().hex[:6]}"
+        headers = make_bff_headers(lecturer_id)
+
+        # 1. List materials without auth -> 401
+        unauth = sync_request("GET", "/v1/materials")
+        assert unauth["status_code"] == 401
+
+        # 2. Create material
+        create_payload = {
+            "title": "Subqueries and CTEs",
+            "topic": "Advanced SQL",
+            "difficulty": "Lanjut",
+            "content": "Pembahasan WITH clause dan nested query.",
+            "sampleSql": "WITH cte AS (SELECT * FROM students) SELECT * FROM cte;",
+            "status": "published",
+        }
+        create_res = sync_request(
+            "POST", "/v1/materials", json_data=create_payload, headers=headers
+        )
+        assert create_res["status_code"] == 201
+        mat = create_res["json"]
+        assert mat["title"] == "Subqueries and CTEs"
+        mat_id = mat["id"]
+
+        # 3. Get single material
+        get_res = sync_request("GET", f"/v1/materials/{mat_id}", headers=headers)
+        assert get_res["status_code"] == 200
+        assert get_res["json"]["id"] == mat_id
+
+        # 4. List materials contains the new material
+        list_res = sync_request("GET", "/v1/materials", headers=headers)
+        assert list_res["status_code"] == 200
+        ids = [m["id"] for m in list_res["json"]["items"]]
+        assert mat_id in ids
+
+        # 5. Update material
+        update_res = sync_request(
+            "PUT",
+            f"/v1/materials/{mat_id}",
+            json_data={"title": "Subqueries and Common Table Expressions", "difficulty": "Menengah"},
+            headers=headers,
+        )
+        assert update_res["status_code"] == 200
+        assert update_res["json"]["title"] == "Subqueries and Common Table Expressions"
+        assert update_res["json"]["difficulty"] == "Menengah"
+
+        # 6. Delete material
+        del_res = sync_request("DELETE", f"/v1/materials/{mat_id}", headers=headers)
+        assert del_res["status_code"] == 204
+
+        # 7. Check 404 on deleted material
+        not_found = sync_request("GET", f"/v1/materials/{mat_id}", headers=headers)
+        assert not_found["status_code"] == 404
+
+
+class TestLecturerEndpoints:
+    def test_lecturer_monitoring(self) -> None:
+        # FR-17 & FR-18: Melihat Aktivitas Mahasiswa & Hasil/Progres Pembelajaran
+        lecturer_id = f"lecturer-{uuid4().hex[:6]}"
+        headers = make_bff_headers(lecturer_id)
+
+        # 1. Activities list
+        act_res = sync_request("GET", "/v1/lecturer/activities", headers=headers)
+        assert act_res["status_code"] == 200
+        assert "items" in act_res["json"]
+        assert isinstance(act_res["json"]["items"], list)
+
+        # 2. Progress list
+        prog_res = sync_request("GET", "/v1/lecturer/progress", headers=headers)
+        assert prog_res["status_code"] == 200
+        assert "items" in prog_res["json"]
+        assert isinstance(prog_res["json"]["items"], list)
+
+
+class TestIoTEndpoints:
+    def test_iot_telemetry_and_monitoring(self) -> None:
+        # FR-19: Monitoring Data IoT
+        # 1. Record telemetry without needing user headers (sensor ingestion)
+        sensor_payload = {
+            "deviceId": "esp32-chem-lab-01",
+            "sensorType": "Temperature",
+            "value": 24.2,
+            "unit": "°C",
+            "status": "normal",
+        }
+        ingest_res = sync_request("POST", "/v1/iot/telemetry", json_data=sensor_payload)
+        assert ingest_res["status_code"] == 201
+        data = ingest_res["json"]
+        assert data["deviceId"] == "esp32-chem-lab-01"
+        assert data["value"] == 24.2
+        assert "recordedAt" in data
+
+        # 2. Query readings as authenticated dashboard user
+        user_id = f"user-{uuid4().hex[:6]}"
+        headers = make_bff_headers(user_id)
+        get_res = sync_request("GET", "/v1/iot/readings", headers=headers)
+        assert get_res["status_code"] == 200
+        items = get_res["json"]["items"]
+        assert len(items) > 0
+        device_ids = [item["deviceId"] for item in items]
+        assert "esp32-chem-lab-01" in device_ids
