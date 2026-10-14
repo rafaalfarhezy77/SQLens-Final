@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.errors import PublicApiError
+from app.services.custom_dataset import CustomDatasetService
 from app.services.educational_stages import build_educational_stages
 
 FORBIDDEN_KEYWORDS = {
@@ -85,7 +86,16 @@ def _json_value(value: object) -> str | int | float | bool | None:
 
 
 class QueryExecutionService:
-    def execute(self, session: Session, *, query: str) -> tuple[list[str], list[dict[str, str | int | float | bool | None]], float, list[dict[str, object]]]:
+    def __init__(self, custom_dataset_service: CustomDatasetService | None = None) -> None:
+        self.custom_dataset_service = custom_dataset_service or CustomDatasetService()
+
+    def execute(
+        self,
+        session: Session,
+        *,
+        query: str,
+        user_id: str | None = None,
+    ) -> tuple[list[str], list[dict[str, str | int | float | bool | None]], float, list[dict[str, object]]]:
         safe_query = validate_read_only_query(query)
         started_at = time.perf_counter()
 
@@ -96,6 +106,9 @@ class QueryExecutionService:
                 session.execute(text("SET TRANSACTION READ ONLY"))
                 timeout_ms = get_settings().sql_statement_timeout_ms
                 session.execute(text(f"SET LOCAL statement_timeout = '{timeout_ms}ms'"))
+                if user_id and self.custom_dataset_service.user_schema_exists(session, user_id):
+                    schema = self.custom_dataset_service.get_user_schema_name(user_id)
+                    session.execute(text(f'SET LOCAL search_path = "{schema}", public'))
                 result = session.execute(text(safe_query))
                 columns = list(result.keys())
                 rows = [

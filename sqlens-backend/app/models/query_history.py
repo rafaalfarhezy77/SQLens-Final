@@ -9,6 +9,7 @@ from app.db.base import Base
 
 class QueryHistory(Base):
     __tablename__ = "query_history"
+    __table_args__ = {"schema": "public"}
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
     user_id: Mapped[str] = mapped_column(String(128), index=True, nullable=False)
