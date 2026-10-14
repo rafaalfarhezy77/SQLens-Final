@@ -11,9 +11,11 @@ import { QueryVisualization } from "@/components/playground/query-visualization"
 import { DEFAULT_SQL_QUERY } from "@/lib/playground/query-processor";
 import { executeQueryForCurrentUser } from "@/lib/api/server/query-execution";
 import { getEducationalDataset } from "@/lib/api/server/datasets";
+import { getCustomDatasetInfo } from "@/lib/api/server/custom-dataset";
 import { BffRequestError } from "@/lib/api/server/errors";
 import type { QueryExecutionSuccessResponse } from "@/lib/api/contracts/query-execution";
 import type { EducationalDataset } from "@/lib/api/contracts/datasets";
+import type { CustomDatasetInfo } from "@/lib/api/contracts/custom-dataset";
 
 export const metadata: Metadata = {
   title: "SQL Playground",
@@ -32,10 +34,16 @@ export default async function PlaygroundPage({
   let executionResult: QueryExecutionSuccessResponse | undefined;
   let executionError: string | undefined;
   let dataset: EducationalDataset | undefined;
+  let customDataset: CustomDatasetInfo | undefined;
   try {
     dataset = await getEducationalDataset();
   } catch {
     dataset = undefined;
+  }
+  try {
+    customDataset = await getCustomDatasetInfo();
+  } catch {
+    customDataset = undefined;
   }
   try {
     const response = await executeQueryForCurrentUser({ query: currentQuery });
@@ -110,7 +118,10 @@ export default async function PlaygroundPage({
 
         {/* Right: Dataset Preview (5 Cols on desktop) */}
         <div className="lg:col-span-5 space-y-4">
-          <DatasetPreview dataset={dataset} />
+          <DatasetPreview
+            educationalDataset={dataset}
+            initialCustomDataset={customDataset}
+          />
         </div>
       </div>
 

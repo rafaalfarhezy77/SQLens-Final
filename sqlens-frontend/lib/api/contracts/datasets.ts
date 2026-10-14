@@ -7,20 +7,20 @@ const datasetValueSchema = z.union([
   z.null(),
 ]);
 
+export const datasetTableSchema = z
+  .object({
+    name: z.string().min(1),
+    columns: z.array(z.string().min(1)),
+    rows: z.array(z.record(datasetValueSchema)),
+    relationship: z.string().optional(),
+  })
+  .strict();
+
+export type DatasetTable = z.infer<typeof datasetTableSchema>;
+
 export const educationalDatasetSchema = z
   .object({
-    tables: z
-      .array(
-        z
-          .object({
-            name: z.string().min(1),
-            columns: z.array(z.string().min(1)),
-            rows: z.array(z.record(datasetValueSchema)),
-            relationship: z.string().optional(),
-          })
-          .strict(),
-      )
-      .min(1),
+    tables: z.array(datasetTableSchema).min(1),
   })
   .strict();
 
