@@ -37,7 +37,11 @@ export async function authenticateWithBackend(
       signal: AbortSignal.timeout(15_000),
     });
 
-    if (response.status === 502 || response.status === 503 || response.status === 504) {
+    if (
+      response.status === 502 ||
+      response.status === 503 ||
+      response.status === 504
+    ) {
       return {
         error:
           "Server sedang bangun dari mode tidur (Render free tier). Silakan tunggu sekitar 15 detik lalu coba lagi.",
@@ -52,9 +56,12 @@ export async function authenticateWithBackend(
     }
     return { user: parsed.data };
   } catch (err: unknown) {
-    const isTimeout =
-      (err instanceof Error && (err.name === "TimeoutError" || err.name === "AbortError")) ||
-      (typeof DOMException !== "undefined" && err instanceof DOMException && err.name === "TimeoutError");
+    const _isTimeout =
+      (err instanceof Error &&
+        (err.name === "TimeoutError" || err.name === "AbortError")) ||
+      (typeof DOMException !== "undefined" &&
+        err instanceof DOMException &&
+        err.name === "TimeoutError");
 
     return {
       error:
@@ -67,7 +74,9 @@ export async function authenticateWithBackend(
 export async function updateUserProfileOnBackend(
   name: string,
 ): Promise<{ user?: AuthenticatedUser; error?: string }> {
-  const { callAuthenticatedFastApi } = await import("@/lib/api/server/fastapi-client");
+  const { callAuthenticatedFastApi } = await import(
+    "@/lib/api/server/fastapi-client"
+  );
   try {
     const response = await callAuthenticatedFastApi("/v1/auth/profile", {
       method: "PATCH",
@@ -87,7 +96,11 @@ export async function updateUserProfileOnBackend(
     }
     return { user: parsed.data };
   } catch (err: unknown) {
-    return { error: err instanceof Error ? err.message : "Terjadi kesalahan saat memperbarui profil." };
+    return {
+      error:
+        err instanceof Error
+          ? err.message
+          : "Terjadi kesalahan saat memperbarui profil.",
+    };
   }
 }
-

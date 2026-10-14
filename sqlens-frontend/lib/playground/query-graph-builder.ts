@@ -56,7 +56,10 @@ export function buildQueryFlowGraph(steps: QueryStep[]): QueryFlowGraph {
   let currentParentIds: string[] = [];
   let currentLayer = 0;
 
-  if (joinStep?.joinDetails && firstStep.clause.toUpperCase().includes("FROM")) {
+  if (
+    joinStep?.joinDetails &&
+    firstStep.clause.toUpperCase().includes("FROM")
+  ) {
     const leftTable = joinStep.joinDetails.leftTable;
     const rightTable = joinStep.joinDetails.rightTable;
 
@@ -72,7 +75,10 @@ export function buildQueryFlowGraph(steps: QueryStep[]): QueryFlowGraph {
       subtitle: "Relasi Sumber Primer",
       operation: `FROM ${leftTable}`,
       inputRowCount: 0,
-      outputRowCount: firstStep.rowsAfterCount > 0 ? Math.ceil(firstStep.rowsAfterCount / 2) : 4,
+      outputRowCount:
+        firstStep.rowsAfterCount > 0
+          ? Math.ceil(firstStep.rowsAfterCount / 2)
+          : 4,
       evaluations: firstStep.rowEvaluations,
       parentIds: [],
       layer: 0,
@@ -87,7 +93,10 @@ export function buildQueryFlowGraph(steps: QueryStep[]): QueryFlowGraph {
       subtitle: "Relasi Sumber Sekunder",
       operation: `JOIN ${rightTable}`,
       inputRowCount: 0,
-      outputRowCount: firstStep.rowsAfterCount > 0 ? Math.floor(firstStep.rowsAfterCount / 2) : 4,
+      outputRowCount:
+        firstStep.rowsAfterCount > 0
+          ? Math.floor(firstStep.rowsAfterCount / 2)
+          : 4,
       evaluations: firstStep.rowEvaluations,
       parentIds: [],
       layer: 0,

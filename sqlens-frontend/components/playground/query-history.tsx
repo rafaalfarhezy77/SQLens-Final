@@ -7,7 +7,10 @@ export interface QueryHistoryProps {
 }
 
 /** Keeps React Query inside the Query History client subtree. */
-export function QueryHistory({ limit, showViewAllLink }: QueryHistoryProps = {}) {
+export function QueryHistory({
+  limit,
+  showViewAllLink,
+}: QueryHistoryProps = {}) {
   return (
     <SqlensQueryClientProvider>
       <QueryHistoryClient limit={limit} showViewAllLink={showViewAllLink} />

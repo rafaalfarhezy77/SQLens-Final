@@ -5,7 +5,7 @@ import { getLatestIoTReadings } from "@/lib/api/server/iot";
 
 export default async function IoTPage() {
   await requireSession();
-  let readings = [];
+  let readings: Awaited<ReturnType<typeof getLatestIoTReadings>> = [];
   try {
     readings = await getLatestIoTReadings();
   } catch (error) {
@@ -22,7 +22,8 @@ export default async function IoTPage() {
       <div className="border-3 border-[#111111] bg-[#D4F4DD] p-4 shadow-[3px_3px_0_#111111] text-xs font-mono font-bold flex items-center gap-2">
         <span className="w-2.5 h-2.5 bg-[#00A854] border border-[#111111] inline-block" />
         <span>
-          PIPELINE IOT AKTIF — Data telemetri sensor terhubung ke backend FastAPI dan PostgreSQL.
+          PIPELINE IOT AKTIF — Data telemetri sensor terhubung ke backend
+          FastAPI dan PostgreSQL.
         </span>
       </div>
       <section className="overflow-x-auto border-3 border-[#111111] shadow-[5px_5px_0_#111111] bg-white">
@@ -48,7 +49,8 @@ export default async function IoTPage() {
             {readings.length === 0 ? (
               <tr>
                 <td colSpan={5} className="p-6 text-center text-[#666666]">
-                  Belum ada data telemetri sensor. Jalankan simulator untuk merekam pembacaan baru.
+                  Belum ada data telemetri sensor. Jalankan simulator untuk
+                  merekam pembacaan baru.
                 </td>
               </tr>
             ) : (
@@ -71,7 +73,9 @@ export default async function IoTPage() {
                   </td>
                   <td className="p-3">
                     <Badge
-                      variant={reading.status === "normal" ? "success" : "yellow"}
+                      variant={
+                        reading.status === "normal" ? "success" : "yellow"
+                      }
                     >
                       {reading.status.toUpperCase()}
                     </Badge>

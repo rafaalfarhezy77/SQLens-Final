@@ -126,116 +126,123 @@ export function QueryHistoryClient({
             </div>
           ) : null}
 
-          {historyQuery.data && historyQuery.data.items.length > 0 ? (
-            (() => {
-              const allItems = historyQuery.data.items;
-              const hasLimit = typeof limit === "number" && limit > 0;
-              const shouldLimit = hasLimit && !isExpanded && allItems.length > limit;
-              const displayedItems = shouldLimit ? allItems.slice(0, limit) : allItems;
+          {historyQuery.data && historyQuery.data.items.length > 0
+            ? (() => {
+                const allItems = historyQuery.data.items;
+                const hasLimit = typeof limit === "number" && limit > 0;
+                const shouldLimit =
+                  hasLimit && !isExpanded && allItems.length > limit;
+                const displayedItems = shouldLimit
+                  ? allItems.slice(0, limit)
+                  : allItems;
 
-              return (
-                <div className="space-y-4">
-                  <ul className="space-y-3" aria-label="Daftar riwayat query">
-                    {displayedItems.map((item) => {
-                      const isDeleting =
-                        deleteMutation.isPending &&
-                        deleteMutation.variables === item.id;
+                return (
+                  <div className="space-y-4">
+                    <ul className="space-y-3" aria-label="Daftar riwayat query">
+                      {displayedItems.map((item) => {
+                        const isDeleting =
+                          deleteMutation.isPending &&
+                          deleteMutation.variables === item.id;
 
-                      return (
-                        <li
-                          key={item.id}
-                          className="border-2 border-[#111111] bg-[#F7F7F2] p-3.5 shadow-[2px_2px_0px_0px_#111111] hover:shadow-[3px_3px_0px_0px_#111111] transition-shadow"
-                        >
-                          <div className="flex flex-wrap items-start justify-between gap-3">
-                            <div className="min-w-0 flex-1 space-y-1.5">
-                              <p className="font-mono text-xs font-bold text-[#111111] bg-white p-2 border border-[#111111] truncate">
-                                {item.query}
-                              </p>
-                              <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono text-black/70">
-                                <span>{formatExecutedAt(item.executedAt)}</span>
-                                <span>·</span>
-                                <span
-                                  className={cn(
-                                    "px-1.5 py-0.2 border text-[10px] font-bold uppercase",
-                                    item.status === "success"
-                                      ? "bg-green-100 text-green-800 border-green-400"
-                                      : "bg-red-100 text-red-800 border-red-400",
-                                  )}
+                        return (
+                          <li
+                            key={item.id}
+                            className="border-2 border-[#111111] bg-[#F7F7F2] p-3.5 shadow-[2px_2px_0px_0px_#111111] hover:shadow-[3px_3px_0px_0px_#111111] transition-shadow"
+                          >
+                            <div className="flex flex-wrap items-start justify-between gap-3">
+                              <div className="min-w-0 flex-1 space-y-1.5">
+                                <p className="font-mono text-xs font-bold text-[#111111] bg-white p-2 border border-[#111111] truncate">
+                                  {item.query}
+                                </p>
+                                <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono text-black/70">
+                                  <span>
+                                    {formatExecutedAt(item.executedAt)}
+                                  </span>
+                                  <span>·</span>
+                                  <span
+                                    className={cn(
+                                      "px-1.5 py-0.2 border text-[10px] font-bold uppercase",
+                                      item.status === "success"
+                                        ? "bg-green-100 text-green-800 border-green-400"
+                                        : "bg-red-100 text-red-800 border-red-400",
+                                    )}
+                                  >
+                                    {item.status === "success"
+                                      ? "Berhasil"
+                                      : "Gagal"}
+                                  </span>
+                                  {item.rowCount !== undefined ? (
+                                    <span>· {item.rowCount} baris</span>
+                                  ) : null}
+                                  {item.executionTimeMs !== undefined ? (
+                                    <span>· {item.executionTimeMs} ms</span>
+                                  ) : null}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0 pt-0.5">
+                                <button
+                                  type="button"
+                                  onClick={() => replayQuery(item.query)}
+                                  className="inline-flex items-center gap-1 border-2 border-[#111111] bg-[#FFD600] px-2.5 py-1 text-xs font-bold shadow-[1px_1px_0px_0px_#111111] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_0px_#111111] active:translate-x-0.5 active:translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#111111] cursor-pointer"
                                 >
-                                  {item.status === "success" ? "Berhasil" : "Gagal"}
-                                </span>
-                                {item.rowCount !== undefined ? (
-                                  <span>· {item.rowCount} baris</span>
-                                ) : null}
-                                {item.executionTimeMs !== undefined ? (
-                                  <span>· {item.executionTimeMs} ms</span>
-                                ) : null}
+                                  <RotateCcw aria-hidden="true" size={12} />
+                                  Ulangi
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => deleteMutation.mutate(item.id)}
+                                  disabled={isDeleting}
+                                  className="inline-flex items-center gap-1 border-2 border-[#111111] bg-white px-2.5 py-1 text-xs font-bold shadow-[1px_1px_0px_0px_#111111] hover:bg-red-50 hover:text-red-600 hover:border-red-600 active:translate-x-0.5 active:translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#111111] disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+                                >
+                                  {isDeleting ? (
+                                    <Loader2
+                                      aria-hidden="true"
+                                      className="size-3 animate-spin"
+                                    />
+                                  ) : (
+                                    <Trash2 aria-hidden="true" size={12} />
+                                  )}
+                                  Hapus
+                                </button>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2 shrink-0 pt-0.5">
-                              <button
-                                type="button"
-                                onClick={() => replayQuery(item.query)}
-                                className="inline-flex items-center gap-1 border-2 border-[#111111] bg-[#FFD600] px-2.5 py-1 text-xs font-bold shadow-[1px_1px_0px_0px_#111111] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_0px_#111111] active:translate-x-0.5 active:translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#111111] cursor-pointer"
-                              >
-                                <RotateCcw aria-hidden="true" size={12} />
-                                Ulangi
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => deleteMutation.mutate(item.id)}
-                                disabled={isDeleting}
-                                className="inline-flex items-center gap-1 border-2 border-[#111111] bg-white px-2.5 py-1 text-xs font-bold shadow-[1px_1px_0px_0px_#111111] hover:bg-red-50 hover:text-red-600 hover:border-red-600 active:translate-x-0.5 active:translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#111111] disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
-                              >
-                                {isDeleting ? (
-                                  <Loader2
-                                    aria-hidden="true"
-                                    className="size-3 animate-spin"
-                                  />
-                                ) : (
-                                  <Trash2 aria-hidden="true" size={12} />
-                                )}
-                                Hapus
-                              </button>
-                            </div>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
+                          </li>
+                        );
+                      })}
+                    </ul>
 
-                  {hasLimit && allItems.length > limit ? (
-                    <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t-2 border-[#111111]">
-                      <span className="font-mono text-xs text-[#666666]">
-                        {shouldLimit
-                          ? `Menampilkan ${limit} dari ${allItems.length} query terbaru`
-                          : `Menampilkan semua (${allItems.length}) riwayat query`}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        {showViewAllLink ? (
-                          <Link
-                            href="/dashboard/query-history"
-                            className="inline-flex items-center gap-1.5 border-2 border-[#111111] bg-[#FFD600] px-3 py-1.5 text-xs font-black uppercase shadow-[2px_2px_0px_0px_#111111] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all"
-                          >
-                            Halaman Riwayat Lengkap &rarr;
-                          </Link>
-                        ) : null}
-                        <button
-                          type="button"
-                          onClick={() => setIsExpanded((prev) => !prev)}
-                          className="inline-flex items-center gap-1.5 border-2 border-[#111111] bg-white px-3 py-1.5 text-xs font-bold uppercase shadow-[2px_2px_0px_0px_#111111] hover:bg-[#F7F7F2] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
-                        >
+                    {hasLimit && allItems.length > limit ? (
+                      <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t-2 border-[#111111]">
+                        <span className="font-mono text-xs text-[#666666]">
                           {shouldLimit
-                            ? `Lihat Semua Query (${allItems.length})`
-                            : "Tampilkan Lebih Sedikit (5)"}
-                        </button>
+                            ? `Menampilkan ${limit} dari ${allItems.length} query terbaru`
+                            : `Menampilkan semua (${allItems.length}) riwayat query`}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          {showViewAllLink ? (
+                            <Link
+                              href="/dashboard/query-history"
+                              className="inline-flex items-center gap-1.5 border-2 border-[#111111] bg-[#FFD600] px-3 py-1.5 text-xs font-black uppercase shadow-[2px_2px_0px_0px_#111111] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 transition-all"
+                            >
+                              Halaman Riwayat Lengkap &rarr;
+                            </Link>
+                          ) : null}
+                          <button
+                            type="button"
+                            onClick={() => setIsExpanded((prev) => !prev)}
+                            className="inline-flex items-center gap-1.5 border-2 border-[#111111] bg-white px-3 py-1.5 text-xs font-bold uppercase shadow-[2px_2px_0px_0px_#111111] hover:bg-[#F7F7F2] active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
+                          >
+                            {shouldLimit
+                              ? `Lihat Semua Query (${allItems.length})`
+                              : "Tampilkan Lebih Sedikit (5)"}
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ) : null}
-                </div>
-              );
-            })()
-          ) : null}
+                    ) : null}
+                  </div>
+                );
+              })()
+            : null}
 
           {mutationError ? (
             <p

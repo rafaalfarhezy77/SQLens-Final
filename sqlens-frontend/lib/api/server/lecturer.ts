@@ -18,7 +18,9 @@ const studentProgressListSchema = z.object({
   items: z.array(studentProgressSchema),
 });
 
-export async function getStudentActivitiesForLecturer(): Promise<StudentActivity[]> {
+export async function getStudentActivitiesForLecturer(): Promise<
+  StudentActivity[]
+> {
   const response = await callAuthenticatedFastApi("/v1/lecturer/activities", {
     method: "GET",
   });
@@ -38,7 +40,9 @@ export async function getStudentActivitiesForLecturer(): Promise<StudentActivity
   return parsed.data.items;
 }
 
-export async function getStudentProgressForLecturer(): Promise<StudentProgress[]> {
+export async function getStudentProgressForLecturer(): Promise<
+  StudentProgress[]
+> {
   const response = await callAuthenticatedFastApi("/v1/lecturer/progress", {
     method: "GET",
   });

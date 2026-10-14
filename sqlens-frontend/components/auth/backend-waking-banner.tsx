@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Clock, RefreshCw, AlertTriangle } from "lucide-react";
+import { Clock, RefreshCw } from "lucide-react";
 
 interface BackendWakingBannerProps {
   initialSeconds?: number;
@@ -66,7 +66,11 @@ export function BackendWakingBanner({
           />
         </div>
         <div className="flex items-center justify-between text-[10px] text-black/70 font-bold uppercase">
-          <span>{secondsLeft > 0 ? `Menunggu server siap... (${secondsLeft} detik)` : "Server kemungkinan sudah bangun!"}</span>
+          <span>
+            {secondsLeft > 0
+              ? `Menunggu server siap... (${secondsLeft} detik)`
+              : "Server kemungkinan sudah bangun!"}
+          </span>
           <span>{secondsLeft > 0 ? `${percentage}%` : "100% SIAP"}</span>
         </div>
       </div>
@@ -74,7 +78,10 @@ export function BackendWakingBanner({
       {secondsLeft === 0 && (
         <div className="pt-1 flex items-center gap-1.5 text-[11px] text-[#00875A] font-black uppercase">
           <RefreshCw size={12} className="shrink-0 animate-spin" />
-          <span>Waktu tunggu selesai. Silakan klik tombol di bawah untuk mencoba kembali!</span>
+          <span>
+            Waktu tunggu selesai. Silakan klik tombol di bawah untuk mencoba
+            kembali!
+          </span>
         </div>
       )}
     </div>

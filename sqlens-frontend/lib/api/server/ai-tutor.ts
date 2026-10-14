@@ -55,7 +55,9 @@ export async function askAiTutor(
     // Bersihkan format markdown jika model membungkusnya dengan ```json ... ```
     let cleanJson = content.trim();
     if (cleanJson.startsWith("```")) {
-      cleanJson = cleanJson.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+      cleanJson = cleanJson
+        .replace(/^```(?:json)?\s*/i, "")
+        .replace(/\s*```$/, "");
     }
 
     const parsedJson: unknown = JSON.parse(cleanJson);

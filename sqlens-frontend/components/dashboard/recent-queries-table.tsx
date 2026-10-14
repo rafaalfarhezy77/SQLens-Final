@@ -58,7 +58,9 @@ export function RecentQueriesTable({
   });
 
   const shouldLimit = !isExpanded && filteredItems.length > 5;
-  const displayedItems = shouldLimit ? filteredItems.slice(0, 5) : filteredItems;
+  const displayedItems = shouldLimit
+    ? filteredItems.slice(0, 5)
+    : filteredItems;
 
   return (
     <section

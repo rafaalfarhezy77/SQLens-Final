@@ -68,7 +68,9 @@ export function QueryFlowPlaybackBar({ nodes }: QueryFlowPlaybackBarProps) {
 
     const timer = setInterval(() => {
       const currentIdx = nodes.findIndex(
-        (n) => n.stepNumber === usePlaygroundUiStore.getState().activeVisualizationStepId,
+        (n) =>
+          n.stepNumber ===
+          usePlaygroundUiStore.getState().activeVisualizationStepId,
       );
       if (currentIdx === -1 || currentIdx >= total - 1) {
         // Loop back to start
@@ -87,7 +89,14 @@ export function QueryFlowPlaybackBar({ nodes }: QueryFlowPlaybackBarProps) {
     }, playback.speedMs);
 
     return () => clearInterval(timer);
-  }, [playback.isPlaying, playback.speedMs, total, nodes, setActiveStepId, setSelectedNodeId]);
+  }, [
+    playback.isPlaying,
+    playback.speedMs,
+    total,
+    nodes,
+    setActiveStepId,
+    setSelectedNodeId,
+  ]);
 
   const activeNode = activeIndex >= 0 ? nodes[activeIndex] : null;
 
@@ -116,7 +125,9 @@ export function QueryFlowPlaybackBar({ nodes }: QueryFlowPlaybackBarProps) {
         <button
           type="button"
           onClick={togglePlay}
-          title={playback.isPlaying ? "Jeda Simulasi" : "Jalankan Simulasi (Play)"}
+          title={
+            playback.isPlaying ? "Jeda Simulasi" : "Jalankan Simulasi (Play)"
+          }
           className="px-3 py-1.5 bg-[#FFD600] text-[#111111] font-black text-xs uppercase flex items-center gap-1.5 border border-[#111111] shadow-[2px_2px_0px_0px_#000000] active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
         >
           {playback.isPlaying ? (
@@ -167,7 +178,9 @@ export function QueryFlowPlaybackBar({ nodes }: QueryFlowPlaybackBarProps) {
 
       {/* Active Stage Indicator */}
       <div className="flex items-center gap-2 font-mono text-xs">
-        <span className="text-white/60 font-semibold hidden sm:inline">STATUS:</span>
+        <span className="text-white/60 font-semibold hidden sm:inline">
+          STATUS:
+        </span>
         {activeNode ? (
           <div className="flex items-center gap-2 bg-[#111111] px-2.5 py-1 border border-[#FFD600]">
             <span className="w-2 h-2 rounded-full bg-[#00D084] animate-pulse" />
@@ -190,7 +203,9 @@ export function QueryFlowPlaybackBar({ nodes }: QueryFlowPlaybackBarProps) {
 
       {/* Speed Selector */}
       <div className="flex items-center gap-1 font-mono text-[11px]">
-        <span className="text-white/50 font-bold mr-1 hidden lg:inline">Kecepatan:</span>
+        <span className="text-white/50 font-bold mr-1 hidden lg:inline">
+          Kecepatan:
+        </span>
         {[
           { label: "1x", ms: 2000 },
           { label: "1.5x", ms: 1400 },

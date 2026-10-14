@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, type MouseEvent, type WheelEvent } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  type MouseEvent,
+  type WheelEvent,
+} from "react";
 import {
   ZoomIn,
   ZoomOut,
@@ -277,7 +284,12 @@ export function QueryFlowCanvas({
               refY="3"
               orient="auto"
             >
-              <polygon points="0 0, 8 3, 0 6" fill="#FFD600" stroke="#111111" strokeWidth="1" />
+              <polygon
+                points="0 0, 8 3, 0 6"
+                fill="#FFD600"
+                stroke="#111111"
+                strokeWidth="1"
+              />
             </marker>
           </defs>
 
@@ -290,7 +302,8 @@ export function QueryFlowCanvas({
 
             const isConnectedToSelected =
               selectedNodeId !== null &&
-              (edge.source === selectedNodeId || edge.target === selectedNodeId);
+              (edge.source === selectedNodeId ||
+                edge.target === selectedNodeId);
 
             return (
               <g key={edge.id} className="query-edge-group">
@@ -381,8 +394,8 @@ export function QueryFlowCanvas({
                 isActive
                   ? "ring-3 ring-[#111111] ring-offset-2 bg-yellow-50 shadow-[6px_6px_0px_0px_#111111] -translate-x-1 -translate-y-1"
                   : isSelected
-                  ? "ring-2 ring-[#0284C7] shadow-[5px_5px_0px_0px_#0284C7] -translate-x-0.5 -translate-y-0.5"
-                  : "shadow-[3px_3px_0px_0px_#111111] hover:shadow-[5px_5px_0px_0px_#111111] hover:-translate-x-0.5 hover:-translate-y-0.5"
+                    ? "ring-2 ring-[#0284C7] shadow-[5px_5px_0px_0px_#0284C7] -translate-x-0.5 -translate-y-0.5"
+                    : "shadow-[3px_3px_0px_0px_#111111] hover:shadow-[5px_5px_0px_0px_#111111] hover:-translate-x-0.5 hover:-translate-y-0.5"
               }`}
             >
               {/* Node Card Header */}
@@ -429,7 +442,9 @@ export function QueryFlowCanvas({
               {/* Node Cardinality Bar */}
               <div className="px-2 py-1 bg-[#F7F7F2] border-t border-[#111111] flex items-center justify-between font-mono text-[10px] select-none">
                 <span className="text-black/60 font-bold">
-                  {node.type === "TABLE" ? "SUMBER" : `${node.inputRowCount} in`}
+                  {node.type === "TABLE"
+                    ? "SUMBER"
+                    : `${node.inputRowCount} in`}
                 </span>
                 <span className="font-black bg-[#FFD600] px-1.5 py-0.2 border border-[#111111] shadow-[1px_1px_0px_0px_#111111]">
                   {node.outputRowCount} rows

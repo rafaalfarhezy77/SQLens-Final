@@ -26,8 +26,13 @@ export interface QueryVisualizationProps {
   query?: string;
 }
 
-export function QueryVisualization({ steps, query = "" }: QueryVisualizationProps) {
-  const [viewMode, setViewMode] = useState<"graph" | "split" | "cards">("split");
+export function QueryVisualization({
+  steps,
+  query = "",
+}: QueryVisualizationProps) {
+  const [viewMode, setViewMode] = useState<"graph" | "split" | "cards">(
+    "split",
+  );
 
   const activeStepId = usePlaygroundUiStore(
     (state) => state.activeVisualizationStepId,
@@ -47,9 +52,7 @@ export function QueryVisualization({ steps, query = "" }: QueryVisualizationProp
   const selectedNode: QueryFlowNode | null = useMemo(() => {
     if (!selectedNodeId) {
       if (activeStepId !== null) {
-        return (
-          graph.nodes.find((n) => n.stepNumber === activeStepId) || null
-        );
+        return graph.nodes.find((n) => n.stepNumber === activeStepId) || null;
       }
       return null;
     }
@@ -83,7 +86,8 @@ export function QueryVisualization({ steps, query = "" }: QueryVisualizationProp
               </CardTitle>
             </div>
             <CardDescription className="text-black/80 font-medium text-xs sm:text-sm">
-              Alur pemrosesan query relasional dari tabel sumber hingga hasil akhir.
+              Alur pemrosesan query relasional dari tabel sumber hingga hasil
+              akhir.
             </CardDescription>
           </div>
 

@@ -104,12 +104,16 @@ export function QueryNodeDetailPanel({
             <div className="flex items-center gap-2">
               <div className="bg-white px-2.5 py-1 border border-[#111111] font-bold shadow-[1px_1px_0px_0px_#111111]">
                 <span className="text-[10px] text-black/50 block">Input</span>
-                <span className="text-sm font-black">{node.inputRowCount} baris</span>
+                <span className="text-sm font-black">
+                  {node.inputRowCount} baris
+                </span>
               </div>
               <ArrowRight size={14} className="text-black/60" />
               <div className="bg-[#FFD600] px-2.5 py-1 border border-[#111111] font-black shadow-[1px_1px_0px_0px_#111111]">
                 <span className="text-[10px] text-black/60 block">Output</span>
-                <span className="text-sm font-black">{node.outputRowCount} baris</span>
+                <span className="text-sm font-black">
+                  {node.outputRowCount} baris
+                </span>
               </div>
             </div>
 
@@ -162,7 +166,9 @@ export function QueryNodeDetailPanel({
                     <th className="p-1.5 border-r border-black/20 font-black">
                       Data
                     </th>
-                    <th className="p-1.5 font-black text-center w-20">Status</th>
+                    <th className="p-1.5 font-black text-center w-20">
+                      Status
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -190,10 +196,10 @@ export function QueryNodeDetailPanel({
                             item.status === "keep"
                               ? "bg-green-100 text-green-800 border-green-300"
                               : item.status === "filtered"
-                              ? "bg-red-100 text-red-800 border-red-300"
-                              : item.status === "joined"
-                              ? "bg-yellow-200 text-black border-yellow-400"
-                              : "bg-gray-100 text-black border-gray-300"
+                                ? "bg-red-100 text-red-800 border-red-300"
+                                : item.status === "joined"
+                                  ? "bg-yellow-200 text-black border-yellow-400"
+                                  : "bg-gray-100 text-black border-gray-300"
                           }`}
                         >
                           {item.statusText || item.status}

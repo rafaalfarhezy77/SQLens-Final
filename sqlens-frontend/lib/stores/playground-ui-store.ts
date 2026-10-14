@@ -12,7 +12,9 @@ export interface PlaygroundUiState {
   selectedNodeId: string | null;
   setSelectedNodeId: (nodeId: string | null) => void;
   playbackState: { isPlaying: boolean; speedMs: number };
-  setPlaybackState: (state: Partial<{ isPlaying: boolean; speedMs: number }>) => void;
+  setPlaybackState: (
+    state: Partial<{ isPlaying: boolean; speedMs: number }>,
+  ) => void;
   visualizationViewMode: "graph" | "cards";
   setVisualizationViewMode: (mode: "graph" | "cards") => void;
 }
