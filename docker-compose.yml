@@ -1,0 +1,59 @@
+services:
+  # ==============================================================================
+  # Database PostgreSQL dengan Persistent Volume Mount
+  # ==============================================================================
+  db:
+    image: postgres:16-alpine
+    container_name: sqlens-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sqlens_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sqlens_password}
+      POSTGRES_DB: ${POSTGRES_DB:-sqlens}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      # Mount direktori data postgres ke volume persistent
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sqlens_app} -d ${POSTGRES_DB:-sqlens}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sqlens-network
+
+  # ==============================================================================
+  # FastAPI Backend Service (SQLens Backend)
+  # ==============================================================================
+  backend:
+    build:
+      context: ./sqlens-backend
+      dockerfile: Dockerfile
+    image: sqlens-backend:latest
+    container_name: sqlens-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-sqlens_app}:${POSTGRES_PASSWORD:-sqlens_password}@db:5432/${POSTGRES_DB:-sqlens}
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      BFF_SHARED_SECRET: ${BFF_SHARED_SECRET:-f3b1c6d8a29e4157b8c0d2e9f1a3456789abcdef0123456789abcdef01234567}
+      SQL_STATEMENT_TIMEOUT_MS: ${SQL_STATEMENT_TIMEOUT_MS:-3000}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      # Mount folder app agar perubahan kode lokal langsung terdeteksi
+      - ./sqlens-backend/app:/app/app
+    networks:
+      - sqlens-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  sqlens-network:
+    driver: bridge
