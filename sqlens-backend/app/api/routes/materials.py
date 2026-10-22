@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
-from app.core.security import TrustedUser, require_trusted_user
+from app.core.security import TrustedUser, require_role, require_trusted_user
 from app.db.session import get_db
 from app.schemas.materials import (
     MaterialCreateRequest,
@@ -17,6 +17,7 @@ router = APIRouter(prefix="/materials", tags=["materials"])
 service = MaterialService()
 DatabaseSession = Annotated[Session, Depends(get_db)]
 CurrentUser = Annotated[TrustedUser, Depends(require_trusted_user)]
+CurrentLecturer = Annotated[TrustedUser, Depends(require_role(["dosen"]))]
 
 
 @router.get("", response_model=MaterialListResponse)
@@ -34,7 +35,7 @@ def get_material(material_id: str, _: CurrentUser, session: DatabaseSession) -> 
 @router.post("", response_model=MaterialResponse, status_code=status.HTTP_201_CREATED)
 def create_material(
     payload: MaterialCreateRequest,
-    current_user: CurrentUser,
+    current_user: CurrentLecturer,
     session: DatabaseSession,
 ) -> MaterialResponse:
     item = service.create_material(session, payload=payload, created_by=current_user.user_id)
@@ -45,7 +46,7 @@ def create_material(
 def update_material(
     material_id: str,
     payload: MaterialUpdateRequest,
-    _: CurrentUser,
+    _: CurrentLecturer,
     session: DatabaseSession,
 ) -> MaterialResponse:
     item = service.update_material(session, material_id=material_id, payload=payload)
@@ -55,7 +56,7 @@ def update_material(
 @router.delete("/{material_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_material(
     material_id: str,
-    _: CurrentUser,
+    _: CurrentLecturer,
     session: DatabaseSession,
 ) -> Response:
     service.delete_material(session, material_id=material_id)

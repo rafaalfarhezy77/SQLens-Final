@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from app.core.security import TrustedUser, require_trusted_user
+from app.core.security import TrustedUser, create_access_token, require_trusted_user
 from app.db.session import get_db
 from app.schemas.auth import (
     AuthenticatedUserResponse,
@@ -28,13 +28,19 @@ def register(payload: RegisterRequest, session: DatabaseSession) -> Authenticate
         password=payload.password,
         role=payload.role,
     )
-    return AuthenticatedUserResponse.model_validate(user)
+    token = create_access_token(user.id, role=user.role)
+    response = AuthenticatedUserResponse.model_validate(user)
+    response.access_token = token
+    return response
 
 
 @router.post("/login", response_model=AuthenticatedUserResponse)
 def login(payload: LoginRequest, session: DatabaseSession) -> AuthenticatedUserResponse:
     user = service.authenticate(session, email=str(payload.email), password=payload.password)
-    return AuthenticatedUserResponse.model_validate(user)
+    token = create_access_token(user.id, role=user.role)
+    response = AuthenticatedUserResponse.model_validate(user)
+    response.access_token = token
+    return response
 
 
 @router.patch("/profile", response_model=AuthenticatedUserResponse)

@@ -27,12 +27,14 @@ class RegisterRequest(LoginRequest):
 
 
 class AuthenticatedUserResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
     id: str
     name: str
     email: str
     role: Role
+    access_token: str | None = Field(default=None, alias="accessToken")
+    token_type: str = Field(default="bearer", alias="tokenType")
 
 
 class UpdateProfileRequest(BaseModel):
