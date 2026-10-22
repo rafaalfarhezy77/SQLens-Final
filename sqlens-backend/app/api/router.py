@@ -1,8 +1,19 @@
 from fastapi import APIRouter
 
-from app.api.routes import auth, custom_dataset, datasets, iot, lecturer, materials, query_execution, query_history
+from app.api.routes import (
+    ai_tutor,
+    auth,
+    custom_dataset,
+    datasets,
+    iot,
+    lecturer,
+    materials,
+    query_execution,
+    query_history,
+)
 
 api_router = APIRouter()
+api_router.include_router(ai_tutor.router)
 api_router.include_router(auth.router)
 api_router.include_router(custom_dataset.router)
 api_router.include_router(datasets.router)
