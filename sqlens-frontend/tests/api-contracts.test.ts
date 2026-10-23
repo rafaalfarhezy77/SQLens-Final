@@ -55,3 +55,19 @@ describe("API query keys", () => {
     expect(apiQueryKeys.queryHistory.list()).toEqual(["sqlens", "query-history", "list"]);
   });
 });
+
+describe("authenticated user contract", () => {
+  it("accepts login response with dual JWT auth payload", async () => {
+    const { authenticatedUserSchema } = await import("@/lib/api/contracts/auth");
+    const result = authenticatedUserSchema.safeParse({
+      id: "usr-123",
+      name: "student-user",
+      email: "student@example.com",
+      role: "mahasiswa",
+      accessToken: "mock.jwt.token",
+      tokenType: "bearer",
+    });
+
+    expect(result.success).toBe(true);
+  });
+});
