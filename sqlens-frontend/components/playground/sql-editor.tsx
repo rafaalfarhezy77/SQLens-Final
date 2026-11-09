@@ -9,9 +9,11 @@ import { DEFAULT_SQL_QUERY } from "@/lib/playground/query-processor";
 
 export interface SqlEditorProps {
   initialQuery?: string;
+  presets?: Array<{ label: string; query: string }>;
+  sharedDatasetId?: string;
 }
 
-const PRESET_QUERIES = [
+const DEFAULT_PRESETS = [
   {
     label: "JOIN & WHERE Filter",
     query: DEFAULT_SQL_QUERY,
@@ -28,6 +30,8 @@ const PRESET_QUERIES = [
 
 export function SqlEditor({
   initialQuery = DEFAULT_SQL_QUERY,
+  presets,
+  sharedDatasetId,
 }: SqlEditorProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -37,12 +41,14 @@ export function SqlEditor({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  const activePresets = presets && presets.length > 0 ? presets : DEFAULT_PRESETS;
+
   const handleExecute = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setError(null);
 
     // 1. Validasi Zod di sisi klien
-    const validation = queryInputSchema.safeParse({ query });
+    const validation = queryInputSchema.safeParse({ query, sharedDatasetId });
     if (!validation.success) {
       setError(
         validation.error.flatten().fieldErrors.query?.[0] ||
@@ -55,17 +61,21 @@ export function SqlEditor({
     startTransition(() => {
       const params = new URLSearchParams(searchParams.toString());
       params.set("q", query);
+      if (sharedDatasetId) {
+        params.set("shared", sharedDatasetId);
+      }
       router.push(`/dashboard/playground?${params.toString()}`);
     });
   };
 
   const handleReset = () => {
-    setQuery(DEFAULT_SQL_QUERY);
+    const defaultQ = activePresets[0]?.query || DEFAULT_SQL_QUERY;
+    setQuery(defaultQ);
     setError(null);
     startTransition(() => {
       const params = new URLSearchParams(searchParams.toString());
       params.delete("q");
-      router.push("/dashboard/playground");
+      router.push(`/dashboard/playground?${params.toString()}`);
     });
   };
 
@@ -97,7 +107,7 @@ export function SqlEditor({
           <span className="text-[10px] font-mono text-white/60 font-bold hidden sm:inline">
             Preset:
           </span>
-          {PRESET_QUERIES.map((preset) => {
+          {activePresets.map((preset) => {
             const isSelected = query.trim() === preset.query.trim();
             return (
               <button

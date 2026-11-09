@@ -21,28 +21,51 @@ interface DatasetPreviewProps {
   dataset?: EducationalDataset;
   educationalDataset?: EducationalDataset;
   initialCustomDataset?: CustomDatasetInfo;
+  studyCaseTables?: DatasetTable[];
+  studyCaseTitle?: string;
+  sharedDatasetTables?: DatasetTable[];
+  sharedDatasetTitle?: string;
 }
 
 export function DatasetPreview({
   dataset,
   educationalDataset,
   initialCustomDataset,
+  studyCaseTables,
+  studyCaseTitle,
+  sharedDatasetTables,
+  sharedDatasetTitle,
 }: DatasetPreviewProps) {
   const router = useRouter();
   const effectiveEducational = educationalDataset || dataset;
   const [customInfo, setCustomInfo] = useState<CustomDatasetInfo | undefined>(
     initialCustomDataset,
   );
-  const [activeTab, setActiveTab] = useState<"educational" | "custom">(
-    initialCustomDataset?.has_custom_dataset ? "custom" : "educational",
-  );
+
+  // Determine initial active tab
+  const defaultTab = sharedDatasetTables && sharedDatasetTables.length > 0
+    ? "shared"
+    : initialCustomDataset?.has_custom_dataset
+      ? "custom"
+      : "case";
+
+  const [activeTab, setActiveTab] = useState<"case" | "shared" | "custom">(defaultTab);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
-  const currentTables: DatasetTable[] =
-    activeTab === "custom"
-      ? customInfo?.tables || []
+  const getActiveTables = (): DatasetTable[] => {
+    if (activeTab === "custom") {
+      return customInfo?.tables || [];
+    }
+    if (activeTab === "shared") {
+      return sharedDatasetTables || [];
+    }
+    return studyCaseTables && studyCaseTables.length > 0
+      ? studyCaseTables
       : effectiveEducational?.tables || [];
+  };
+
+  const currentTables = getActiveTables();
 
   const handleReset = async () => {
     if (
@@ -57,7 +80,7 @@ export function DatasetPreview({
       const res = await fetch("/api/custom-dataset", { method: "DELETE" });
       if (res.ok) {
         setCustomInfo({ has_custom_dataset: false, tables: [] });
-        setActiveTab("educational");
+        setActiveTab("case");
         router.refresh();
       }
     } finally {
@@ -94,7 +117,9 @@ export function DatasetPreview({
             <p className="text-xs text-[#555555] font-medium mt-0.5">
               {activeTab === "custom"
                 ? "Database kustom pengguna aktif untuk eksplorasi dan query."
-                : "Data sampel edukatif untuk mempraktikkan proyeksi, filter, dan join."}
+                : activeTab === "shared"
+                  ? `Dataset kelas bersama dari dosen: ${sharedDatasetTitle || "Tugas Kelas"}`
+                  : `Data sampel edukatif: ${studyCaseTitle || "Sistem Akademik Kampus"}`}
             </p>
           </div>
 
@@ -108,7 +133,7 @@ export function DatasetPreview({
             >
               <Upload size={13} />
               <span>
-                {customInfo?.has_custom_dataset ? "Ganti DB" : "+ Upload DB"}
+                {customInfo?.has_custom_dataset ? "Ganti DB Saya" : "+ Upload DB"}
               </span>
             </button>
 
@@ -129,25 +154,43 @@ export function DatasetPreview({
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex border-b-2 border-[#111111] bg-[#EEEEEE] text-xs font-bold">
+        <div className="flex border-b-2 border-[#111111] bg-[#EEEEEE] text-xs font-bold overflow-x-auto">
           <button
             type="button"
-            onClick={() => setActiveTab("educational")}
-            className={`flex-1 py-2 px-3 text-center transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
-              activeTab === "educational"
+            onClick={() => setActiveTab("case")}
+            className={`flex-1 min-w-[120px] py-2 px-3 text-center transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
+              activeTab === "case"
                 ? "bg-white text-[#111111] border-b-2 border-[#FFD600]"
                 : "text-[#666666] hover:bg-white/60"
             }`}
           >
-            <span>Bawaan (Edukasi)</span>
+            <span>{studyCaseTitle ? `Kasus: ${studyCaseTitle}` : "Bawaan (Edukasi)"}</span>
             <span className="text-[10px] bg-[#E0E0E0] px-1.5 py-0.2 border border-[#111111]/30">
-              {effectiveEducational?.tables.length || 0}
+              {studyCaseTables?.length || effectiveEducational?.tables.length || 0}
             </span>
           </button>
+
+          {sharedDatasetTables && sharedDatasetTables.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setActiveTab("shared")}
+              className={`flex-1 min-w-[120px] py-2 px-3 text-center transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
+                activeTab === "shared"
+                  ? "bg-white text-[#111111] border-b-2 border-[#00D084]"
+                  : "text-[#666666] hover:bg-white/60"
+              }`}
+            >
+              <span>Dataset Dosen</span>
+              <span className="text-[10px] bg-[#D4F4DD] text-[#006633] px-1.5 py-0.2 border border-[#111111]">
+                {sharedDatasetTables.length}
+              </span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={() => setActiveTab("custom")}
-            className={`flex-1 py-2 px-3 text-center transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`flex-1 min-w-[120px] py-2 px-3 text-center transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
               activeTab === "custom"
                 ? "bg-white text-[#111111] border-b-2 border-[#FFD600]"
                 : "text-[#666666] hover:bg-white/60"
@@ -234,11 +277,9 @@ export function DatasetPreview({
                           </td>
                         </tr>
                       ) : (
-                        table.rows.map((row) => (
+                        table.rows.map((row, rowIdx) => (
                           <tr
-                            key={`${table.name}-${table.columns
-                              .map((column) => String(row[column] ?? ""))
-                              .join("|")}`}
+                            key={`${table.name}-${rowIdx}`}
                             className="border-b border-[#111111]/15 last:border-0 odd:bg-white even:bg-[#F7F7F2]/60 hover:bg-[#FFF9C4]/40 transition-colors"
                           >
                             {table.columns.map((column) => (

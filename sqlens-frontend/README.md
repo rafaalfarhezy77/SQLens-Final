@@ -20,8 +20,8 @@ Browser
 
 ## Feature surface
 
-- Mahasiswa: dashboard, SQL Playground, learning modules, AI Tutor, IoT monitoring, and Profile.
-- Dosen/Asisten: role-aware dashboard, material/exercise draft management, student activity, student progress, IoT monitoring, and Profile.
+- Mahasiswa: dashboard, multi-case SQL Playground (Akademik, E-Commerce, Perpustakaan, Shared Dataset Dosen, Custom DB), learning modules, AI Tutor, IoT monitoring, and Profile.
+- Dosen/Asisten: role-aware dashboard, class shared dataset manager (CSV/SQL upload for students), material/exercise draft management, student activity, student progress, IoT monitoring, and Profile.
 - Lecturer and IoT pages use clearly labelled frontend demo fixtures until their BFF endpoints and live data sources are available; they do not claim live production data.
 
 ## Major routes

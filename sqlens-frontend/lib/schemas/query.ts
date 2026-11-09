@@ -27,6 +27,7 @@ export const queryInputSchema = z.object({
           "Operasi destruktif (DROP, DELETE, TRUNCATE, ALTER, UPDATE) tidak diizinkan dalam sandbox edukasi SQLens.",
       },
     ),
+  sharedDatasetId: z.string().optional(),
 });
 
 export type QueryInput = z.infer<typeof queryInputSchema>;
