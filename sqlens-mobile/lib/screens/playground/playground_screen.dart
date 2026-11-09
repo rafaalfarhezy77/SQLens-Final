@@ -98,6 +98,19 @@ class PlaygroundScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.refresh, color: AppColors.borderBlack),
+            tooltip: 'Segarkan Workspace',
+            onPressed: () {
+              playground.clearError();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Workspace SQL Playground disegarkan.'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.bookmark_border, color: AppColors.borderBlack),
             tooltip: 'Template Query',
             onPressed: () => _showPresetBottomSheet(context, playground),

@@ -1,7 +1,7 @@
 class ApiEndpoints {
-  // Default base URL. For Android Emulator: 'http://10.0.2.2:8000/v1'
-  // For physical device on same Wi-Fi: use your PC's IP, e.g. 'http://192.168.1.15:8000/v1'
-  static String baseUrl = 'http://10.0.2.2:8000/v1';
+  // Default base URL (Render Cloud backend)
+  // For local development: 'http://10.0.2.2:8000/v1' or 'http://127.0.0.1:8000/v1'
+  static String baseUrl = 'https://sqlens-final.onrender.com/v1';
 
   // Auth endpoints
   static String get login => '$baseUrl/auth/login';

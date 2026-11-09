@@ -25,6 +25,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  Future<void> _refresh() async {
+    final auth = context.read<AuthProvider>();
+    auth.clearError();
+    await auth.initSession();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Halaman registrasi berhasil disegarkan.'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
@@ -46,18 +60,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
             color: AppColors.borderBlack,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: AppColors.borderBlack),
+            tooltip: 'Segarkan Halaman',
+            onPressed: _refresh,
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2),
           child: Container(color: AppColors.borderBlack, height: 2),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
+      body: RefreshIndicator(
+        color: AppColors.borderBlack,
+        backgroundColor: AppColors.primaryYellow,
+        onRefresh: _refresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(20.0),
         child: BrutalistCard(
           backgroundColor: AppColors.cardWhite,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Center(
+                child: Container(
+                  width: 64,
+                  height: 64,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryYellow,
+                    border: Border.all(color: AppColors.borderBlack, width: 2),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: AppColors.borderBlack,
+                        offset: Offset(4, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRect(
+                    child: Transform.scale(
+                      scale: 1.1,
+                      child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
+                    ),
+                  ),
+                ),
+              ),
               const Text(
                 'BUAT AKUN BARU',
                 style: TextStyle(
@@ -235,6 +285,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

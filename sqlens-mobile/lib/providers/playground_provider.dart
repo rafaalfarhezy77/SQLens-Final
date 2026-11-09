@@ -57,6 +57,11 @@ class PlaygroundProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearError() {
+    _errorMessage = null;
+    notifyListeners();
+  }
+
   Future<bool> executeCurrentQuery() async {
     final sql = queryController.text.trim();
     if (sql.isEmpty) {
@@ -94,8 +99,8 @@ class PlaygroundProvider extends ChangeNotifier {
       _isExecuting = false;
       notifyListeners();
       return false;
-    } catch (e) {
-      _errorMessage = 'Gagal mengeksekusi query: $e';
+    } catch (_) {
+      _errorMessage = 'Gagal memproses eksekusi query. Pastikan sintaks SQL benar atau coba beberapa saat lagi.';
       _isExecuting = false;
       notifyListeners();
       return false;

@@ -4,6 +4,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/widgets/brutalist_card.dart';
 import '../../providers/ai_tutor_provider.dart';
 import '../../providers/playground_provider.dart';
+import 'ai_tutor_history_screen.dart';
 
 class AiTutorScreen extends StatefulWidget {
   const AiTutorScreen({super.key});
@@ -35,6 +36,54 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
     });
   }
 
+  void _showResetConfirmation(BuildContext context, AiTutorProvider aiTutor) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.cardWhite,
+        shape: const RoundedRectangleBorder(
+          side: BorderSide(color: AppColors.borderBlack, width: 2),
+        ),
+        title: const Text(
+          'MULAI ULANG PERCAKAPAN?',
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+        ),
+        content: const Text(
+          'Percakapan saat ini akan otomatis disimpan ke Riwayat AI Tutor dan layar chat akan dikembalikan ke awal. Apakah Anda ingin melanjutkan?',
+          style: TextStyle(fontSize: 13, color: AppColors.borderBlack),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal', style: TextStyle(color: AppColors.borderBlack)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryYellow,
+              foregroundColor: AppColors.borderBlack,
+              side: const BorderSide(color: AppColors.borderBlack, width: 2),
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            ),
+            onPressed: () {
+              Navigator.pop(ctx);
+              aiTutor.resetConversation();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Sesi diarsipkan ke Riwayat dan percakapan di-reset.'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+            },
+            child: const Text(
+              'Mulai Ulang',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final aiTutor = context.watch<AiTutorProvider>();
@@ -47,6 +96,21 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
         elevation: 0,
         title: Row(
           children: [
+            Container(
+              width: 30,
+              height: 30,
+              margin: const EdgeInsets.only(right: 8),
+              decoration: BoxDecoration(
+                color: AppColors.primaryYellow,
+                border: Border.all(color: AppColors.borderBlack, width: 2),
+              ),
+              child: ClipRect(
+                child: Transform.scale(
+                  scale: 1.1,
+                  child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
+                ),
+              ),
+            ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               color: AppColors.primaryYellow,
@@ -67,6 +131,23 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.history, color: AppColors.borderBlack),
+            tooltip: 'Riwayat Percakapan',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AiTutorHistoryScreen()),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh, color: AppColors.borderBlack),
+            tooltip: 'Mulai Ulang Percakapan',
+            onPressed: () => _showResetConfirmation(context, aiTutor),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2),
           child: Container(color: AppColors.borderBlack, height: 2),

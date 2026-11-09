@@ -3,11 +3,27 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/brutalist_card.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/history_provider.dart';
 
 class HomeTab extends StatelessWidget {
   final Function(int tabIndex) onNavigateToTab;
 
   const HomeTab({super.key, required this.onNavigateToTab});
+
+  Future<void> _refresh(BuildContext context) async {
+    await Future.wait([
+      context.read<AuthProvider>().initSession(),
+      context.read<HistoryProvider>().fetchHistory(),
+    ]);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Dashboard berhasil disegarkan.'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +37,21 @@ class HomeTab extends StatelessWidget {
         elevation: 0,
         title: Row(
           children: [
+            Container(
+              width: 32,
+              height: 32,
+              margin: const EdgeInsets.only(right: 8),
+              decoration: BoxDecoration(
+                color: AppColors.primaryYellow,
+                border: Border.all(color: AppColors.borderBlack, width: 2),
+              ),
+              child: ClipRect(
+                child: Transform.scale(
+                  scale: 1.1,
+                  child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
+                ),
+              ),
+            ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               color: AppColors.primaryYellow,
@@ -36,16 +67,28 @@ class HomeTab extends StatelessWidget {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: AppColors.borderBlack),
+            tooltip: 'Segarkan Dashboard',
+            onPressed: () => _refresh(context),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2),
           child: Container(color: AppColors.borderBlack, height: 2),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+      body: RefreshIndicator(
+        color: AppColors.borderBlack,
+        backgroundColor: AppColors.primaryYellow,
+        onRefresh: () => _refresh(context),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
             // Welcome Card
             BrutalistCard(
               backgroundColor: AppColors.primaryYellow,
@@ -188,6 +231,7 @@ class HomeTab extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 }

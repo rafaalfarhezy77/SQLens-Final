@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../core/constants/api_endpoints.dart';
 import '../core/network/api_client.dart';
@@ -15,6 +16,11 @@ class AuthProvider extends ChangeNotifier {
   bool get isAuthenticated => _user != null;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+
+  void clearError() {
+    _errorMessage = null;
+    notifyListeners();
+  }
 
   AuthProvider() {
     initSession();
@@ -82,8 +88,13 @@ class AuthProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return false;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan tidak terduga: $e';
+    } on DioException catch (e) {
+      _errorMessage = ApiClient.transformDioError(e).message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (_) {
+      _errorMessage = 'Terjadi kendala saat memproses login. Silakan periksa koneksi internet Anda dan coba lagi.';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -132,8 +143,13 @@ class AuthProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return false;
-    } catch (e) {
-      _errorMessage = 'Terjadi kesalahan tidak terduga: $e';
+    } on DioException catch (e) {
+      _errorMessage = ApiClient.transformDioError(e).message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (_) {
+      _errorMessage = 'Terjadi kendala saat memproses registrasi. Silakan coba beberapa saat lagi.';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -147,7 +163,10 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> setCustomBaseUrl(String url) async {
-    final cleanUrl = url.trim().replaceAll(RegExp(r'/+$'), '');
+    var cleanUrl = url.trim().replaceAll(RegExp(r'/+$'), '');
+    if (!cleanUrl.endsWith('/v1')) {
+      cleanUrl = '$cleanUrl/v1';
+    }
     ApiEndpoints.baseUrl = cleanUrl;
     await TokenStorage.saveCustomBaseUrl(cleanUrl);
     notifyListeners();

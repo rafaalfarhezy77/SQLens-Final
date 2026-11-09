@@ -23,4 +23,11 @@ class AiTutorResponseModel {
       reasoning: rawReasoning.map((r) => r.toString()).toList(),
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'explanation': explanation,
+    'hint': hint,
+    'sqlConcept': sqlConcept,
+    'reasoning': reasoning,
+  };
 }

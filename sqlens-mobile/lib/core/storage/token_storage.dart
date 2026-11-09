@@ -8,6 +8,7 @@ class TokenStorage {
   static const _keyUserEmail = 'sqlens_user_email';
   static const _keyUserRole = 'sqlens_user_role';
   static const _keyBaseUrl = 'sqlens_custom_base_url';
+  static const _keyAiTutorHistory = 'sqlens_ai_tutor_history';
 
   static Future<void> saveSession({
     required String token,
@@ -57,5 +58,17 @@ class TokenStorage {
 
   static Future<String?> getCustomBaseUrl() async {
     return await _storage.read(key: _keyBaseUrl);
+  }
+
+  static Future<void> saveAiTutorHistory(String jsonString) async {
+    await _storage.write(key: _keyAiTutorHistory, value: jsonString);
+  }
+
+  static Future<String?> getAiTutorHistory() async {
+    return await _storage.read(key: _keyAiTutorHistory);
+  }
+
+  static Future<void> clearAiTutorHistory() async {
+    await _storage.delete(key: _keyAiTutorHistory);
   }
 }

@@ -76,40 +76,51 @@ class _QueryHistoryScreenState extends State<QueryHistoryScreen> {
           child: Container(color: AppColors.borderBlack, height: 2),
         ),
       ),
-      body: history.isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppColors.borderBlack),
-            )
-          : history.items.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: BrutalistCard(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
-                          Icon(Icons.history_outlined, size: 48, color: AppColors.textMuted),
-                          SizedBox(height: 12),
-                          Text(
-                            'BELUM ADA RIWAYAT',
-                            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+      body: RefreshIndicator(
+        color: AppColors.borderBlack,
+        backgroundColor: AppColors.primaryYellow,
+        onRefresh: () async => await history.fetchHistory(),
+        child: history.isLoading
+            ? const Center(
+                child: CircularProgressIndicator(color: AppColors.borderBlack),
+              )
+            : history.items.isEmpty
+                ? SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.7,
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: BrutalistCard(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(Icons.history_outlined, size: 48, color: AppColors.textMuted),
+                                SizedBox(height: 12),
+                                Text(
+                                  'BELUM ADA RIWAYAT',
+                                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                                ),
+                                SizedBox(height: 6),
+                                Text(
+                                  'Setiap query yang Anda jalankan di Playground akan otomatis tercatat dan tersinkronisasi di sini.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                                ),
+                              ],
+                            ),
                           ),
-                          SizedBox(height: 6),
-                          Text(
-                            'Setiap query yang Anda jalankan di Playground akan otomatis tercatat dan tersinkronisasi di sini.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 12, color: AppColors.textMuted),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: history.items.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
+                  )
+                : ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16),
+                    itemCount: history.items.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
                     final item = history.items[index];
                     final isSuccess = item.status.toLowerCase() == 'success';
 
@@ -211,6 +222,7 @@ class _QueryHistoryScreenState extends State<QueryHistoryScreen> {
                     );
                   },
                 ),
+      ),
     );
   }
 }

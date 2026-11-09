@@ -36,6 +36,14 @@ class ProfileTab extends StatelessWidget {
                 runSpacing: 6,
                 children: [
                   GestureDetector(
+                    onTap: () => urlController.text = 'https://sqlens-final.onrender.com/v1',
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      color: AppColors.primaryYellow,
+                      child: const Text('Render (Cloud)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  GestureDetector(
                     onTap: () => urlController.text = 'http://127.0.0.1:8000/v1',
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -104,6 +112,18 @@ class ProfileTab extends StatelessWidget {
     );
   }
 
+  Future<void> _refresh(BuildContext context) async {
+    await context.read<AuthProvider>().initSession();
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Profil berhasil disegarkan.'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
@@ -123,16 +143,28 @@ class ProfileTab extends StatelessWidget {
             letterSpacing: 0.5,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: AppColors.borderBlack),
+            tooltip: 'Segarkan Profil',
+            onPressed: () => _refresh(context),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2),
           child: Container(color: AppColors.borderBlack, height: 2),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+      body: RefreshIndicator(
+        color: AppColors.borderBlack,
+        backgroundColor: AppColors.primaryYellow,
+        onRefresh: () => _refresh(context),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
             // User Card
             BrutalistCard(
               backgroundColor: AppColors.cardWhite,
@@ -264,6 +296,7 @@ class ProfileTab extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

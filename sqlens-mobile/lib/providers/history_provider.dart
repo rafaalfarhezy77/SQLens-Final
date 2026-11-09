@@ -30,8 +30,8 @@ class HistoryProvider extends ChangeNotifier {
       _errorMessage = e.message;
       _isLoading = false;
       notifyListeners();
-    } catch (e) {
-      _errorMessage = 'Gagal memuat riwayat kueri: $e';
+    } catch (_) {
+      _errorMessage = 'Gagal memuat riwayat kueri. Silakan periksa jaringan internet Anda.';
       _isLoading = false;
       notifyListeners();
     }

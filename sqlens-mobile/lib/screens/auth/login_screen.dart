@@ -53,6 +53,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   runSpacing: 6,
                   children: [
                     GestureDetector(
+                      onTap: () => urlController.text = 'https://sqlens-final.onrender.com/v1',
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        color: AppColors.primaryYellow,
+                        child: const Text('Render (Cloud)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    GestureDetector(
                       onTap: () => urlController.text = 'http://127.0.0.1:8000/v1',
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -121,6 +129,20 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Future<void> _refresh() async {
+    final auth = context.read<AuthProvider>();
+    auth.clearError();
+    await auth.initSession();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Halaman login berhasil disegarkan.'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
@@ -132,6 +154,21 @@ class _LoginScreenState extends State<LoginScreen> {
         elevation: 0,
         title: Row(
           children: [
+            Container(
+              width: 32,
+              height: 32,
+              margin: const EdgeInsets.only(right: 8),
+              decoration: BoxDecoration(
+                color: AppColors.primaryYellow,
+                border: Border.all(color: AppColors.borderBlack, width: 2),
+              ),
+              child: ClipRect(
+                child: Transform.scale(
+                  scale: 1.1,
+                  child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
+                ),
+              ),
+            ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
@@ -161,6 +198,11 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.refresh, color: AppColors.borderBlack),
+            tooltip: 'Segarkan Halaman',
+            onPressed: _refresh,
+          ),
+          IconButton(
             icon: const Icon(Icons.settings_outlined, color: AppColors.borderBlack),
             tooltip: 'Konfigurasi IP Backend',
             onPressed: _showServerSettingsDialog,
@@ -171,9 +213,14 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Container(color: AppColors.borderBlack, height: 2),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
+      body: RefreshIndicator(
+        color: AppColors.borderBlack,
+        backgroundColor: AppColors.primaryYellow,
+        onRefresh: _refresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 10),
@@ -182,6 +229,30 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Center(
+                    child: Container(
+                      width: 68,
+                      height: 68,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryYellow,
+                        border: Border.all(color: AppColors.borderBlack, width: 2),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: AppColors.borderBlack,
+                            offset: Offset(4, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipRect(
+                child: Transform.scale(
+                  scale: 1.1,
+                  child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
+                ),
+              ),
+                    ),
+                  ),
                   const Text(
                     'MASUK KE AKUN',
                     style: TextStyle(
@@ -362,6 +433,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
