@@ -10,6 +10,8 @@ from app.api.routes import (
     materials,
     query_execution,
     query_history,
+    shared_datasets,
+    study_cases,
 )
 
 api_router = APIRouter()
@@ -22,5 +24,8 @@ api_router.include_router(lecturer.router)
 api_router.include_router(materials.router)
 api_router.include_router(query_execution.router)
 api_router.include_router(query_history.router)
+api_router.include_router(shared_datasets.router)
+api_router.include_router(shared_datasets.lecturer_router)
+api_router.include_router(study_cases.router)
 
 

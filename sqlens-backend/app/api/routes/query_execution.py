@@ -32,7 +32,10 @@ def execute_query(
 ) -> QueryExecutionSuccessResponse | JSONResponse:
     try:
         columns, rows, execution_time_ms, stages = execution_service.execute(
-            session, query=payload.query, user_id=current_user.user_id
+            session,
+            query=payload.query,
+            user_id=current_user.user_id,
+            shared_dataset_id=payload.shared_dataset_id,
         )
     except PublicApiError as error:
         history_service.record_attempt(

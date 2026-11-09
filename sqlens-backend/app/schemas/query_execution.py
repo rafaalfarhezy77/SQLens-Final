@@ -6,9 +6,10 @@ from app.schemas.common import ApiErrorResponse
 
 
 class QueryExecutionRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, populate_by_name=True)
 
     query: str = Field(min_length=5, max_length=500)
+    shared_dataset_id: str | None = Field(default=None, alias="sharedDatasetId")
 
 
 class JoinVisualizationDetails(BaseModel):

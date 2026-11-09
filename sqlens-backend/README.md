@@ -26,10 +26,17 @@ development; production schema changes need a reviewed migration process.
 
 ## Routes
 
-- `POST /v1/query-executions`
+- `POST /v1/query-executions` (mendukung query pada dataset bawaan, dataset kustom, dan shared dataset dosen)
 - `POST /v1/auth/register` (Mahasiswa and Dosen registration)
 - `POST /v1/auth/login` (Mahasiswa or persisted Dosen account)
 - `GET /v1/datasets/educational`
+- `GET /v1/datasets/custom` & `POST /v1/datasets/custom/upload-csv` & `POST /v1/datasets/custom/upload-sql`
+- `GET /v1/study-cases` (Daftar studi kasus: Akademik, E-Commerce, Perpustakaan beserta tantangan & sampel)
+- `GET /v1/study-cases/{case_id}` (Detail studi kasus beserta skema dan sample data)
+- `GET /v1/shared-datasets` (Daftar dataset bersama kelas yang diunggah Dosen)
+- `GET /v1/shared-datasets/{dataset_id}` (Detail dataset bersama dan tabel sample)
+- `POST /v1/lecturer/shared-datasets/upload-csv` & `POST /v1/lecturer/shared-datasets/upload-sql` (Upload dataset bersama oleh Dosen)
+- `DELETE /v1/lecturer/shared-datasets/{dataset_id}` (Hapus dataset bersama oleh Dosen)
 - `GET /v1/query-history`
 - `DELETE /v1/query-history/{history_id}`
 - `DELETE /v1/query-history`
