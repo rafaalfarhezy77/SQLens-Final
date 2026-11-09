@@ -1,15 +1,24 @@
 # SQLens Final
 
-SQLens Final contains two independently runnable services:
+SQLens Final contains three coordinated services:
 
 ```text
 SQLens-Final/
-  sqlens-frontend/  Next.js frontend and BFF
-  sqlens-backend/   FastAPI backend
+  sqlens-frontend/  Next.js 16 frontend and BFF
+  sqlens-backend/   FastAPI backend & SQL Sandbox Engine
+  sqlens-mobile/    Flutter cross-platform mobile client
 ```
 
 PostgreSQL remains an external dependency. The frontend calls the backend through
-its server-side BFF, so browsers never call FastAPI directly.
+its server-side BFF, while the mobile client communicates with FastAPI via JWT Bearer tokens.
+
+## Features Across All Platforms
+- **Multi-Studi Kasus & Real-World Databases:** Sistem Akademik Kampus, E-Commerce & Retail, Sirkulasi Perpustakaan.
+- **Tantangan SQL & Petunjuk (Hints):** Soal latihan interaktif dengan pemuatan query cepat.
+- **Dataset Kelas Bersama Dosen:** Dosen dapat mengunggah CSV atau skrip SQL yang langsung tersedia bagi mahasiswa.
+- **Upload Database Kustom Mahasiswa:** Pengguna dapat mengunggah file CSV atau skrip SQL mandiri ke skema terisolasi.
+- **Visualisasi Transformasi Alur Data (Step-by-Step):** FROM $\rightarrow$ JOIN $\rightarrow$ WHERE $\rightarrow$ SELECT.
+- **AI Tutor Interaktif:** Asisten pedagogis Socratic berbahasa Indonesia.
 
 ## Local setup
 

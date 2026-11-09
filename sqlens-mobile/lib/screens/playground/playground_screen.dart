@@ -3,80 +3,15 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/brutalist_card.dart';
 import '../../providers/playground_provider.dart';
+import 'widgets/custom_dataset_bottom_sheet.dart';
 import 'widgets/quick_sql_toolbar.dart';
 import 'widgets/result_table_widget.dart';
+import 'widgets/study_case_bottom_sheet.dart';
+import 'widgets/table_schema_bottom_sheet.dart';
 import 'widgets/visualization_stepper_widget.dart';
 
 class PlaygroundScreen extends StatelessWidget {
   const PlaygroundScreen({super.key});
-
-  static const List<Map<String, String>> _presets = [
-    {
-      'title': '1. SELECT Dasar & Alias',
-      'query': 'SELECT id, name AS nama_mahasiswa, major\nFROM students;',
-    },
-    {
-      'title': '2. Filter WHERE (score >= 80)',
-      'query': 'SELECT student_id, course, score\nFROM scores\nWHERE score >= 80;',
-    },
-    {
-      'title': '3. INNER JOIN Students & Scores',
-      'query': 'SELECT s.name, sc.course, sc.score\nFROM students s\nJOIN scores sc ON s.id = sc.student_id\nWHERE sc.score >= 80;',
-    },
-    {
-      'title': '4. ORDER BY & LIMIT',
-      'query': 'SELECT * FROM students\nORDER BY name ASC\nLIMIT 2;',
-    },
-  ];
-
-  void _showPresetBottomSheet(BuildContext context, PlaygroundProvider playground) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.cardWhite,
-      shape: const RoundedRectangleBorder(
-        side: BorderSide(color: AppColors.borderBlack, width: 2),
-      ),
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'PILIH TEMPLATE QUERY EDUKASI',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
-              ),
-              const SizedBox(height: 12),
-              ..._presets.map((preset) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: BrutalistCard(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    backgroundColor: AppColors.backgroundLight,
-                    onTap: () {
-                      playground.setQuery(preset['query']!);
-                      Navigator.pop(ctx);
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          preset['title']!,
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                        ),
-                        const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.borderBlack),
-                      ],
-                    ),
-                  ),
-                );
-              }),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,22 +33,19 @@ class PlaygroundScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: AppColors.borderBlack),
-            tooltip: 'Segarkan Workspace',
-            onPressed: () {
-              playground.clearError();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Workspace SQL Playground disegarkan.'),
-                  duration: Duration(seconds: 1),
-                ),
-              );
-            },
+            icon: const Icon(Icons.table_chart_outlined, color: AppColors.borderBlack),
+            tooltip: 'Lihat Skema & Tabel',
+            onPressed: () => TableSchemaBottomSheet.show(context),
           ),
           IconButton(
-            icon: const Icon(Icons.bookmark_border, color: AppColors.borderBlack),
-            tooltip: 'Template Query',
-            onPressed: () => _showPresetBottomSheet(context, playground),
+            icon: const Icon(Icons.upload_file_outlined, color: AppColors.borderBlack),
+            tooltip: 'Unggah Database Kustom',
+            onPressed: () => CustomDatasetBottomSheet.show(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.menu_book_outlined, color: AppColors.borderBlack),
+            tooltip: 'Pilih Studi Kasus & Soal',
+            onPressed: () => StudyCaseBottomSheet.show(context),
           ),
         ],
         bottom: PreferredSize(
@@ -168,7 +100,7 @@ class PlaygroundScreen extends StatelessWidget {
           child: Center(
             child: Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.w900,
                 fontSize: 12,
                 letterSpacing: 0.5,
@@ -184,6 +116,72 @@ class PlaygroundScreen extends StatelessWidget {
   Widget _buildEditorTab(BuildContext context, PlaygroundProvider playground) {
     return Column(
       children: [
+        // Active Study Case / Database Banner
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: const BoxDecoration(
+            color: AppColors.cardWhite,
+            border: Border(bottom: BorderSide(color: AppColors.borderBlack, width: 1.5)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                color: playground.isCustomMode
+                    ? AppColors.primaryYellow
+                    : playground.activeSharedId != null
+                        ? AppColors.successGreen
+                        : AppColors.primaryYellow,
+                child: Text(
+                  playground.isCustomMode
+                      ? 'DB KUSTOM'
+                      : playground.activeSharedId != null
+                          ? 'TUGAS DOSEN'
+                          : 'STUDI KASUS',
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  playground.currentActiveTitle,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              GestureDetector(
+                onTap: () => StudyCaseBottomSheet.show(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.backgroundLight,
+                    border: Border.all(color: AppColors.borderBlack, width: 1),
+                  ),
+                  child: const Text(
+                    'GANTI KASUS',
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
+              GestureDetector(
+                onTap: () => TableSchemaBottomSheet.show(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.backgroundLight,
+                    border: Border.all(color: AppColors.borderBlack, width: 1),
+                  ),
+                  child: const Text(
+                    'SKEMA TABEL',
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
         // Error notification if execution failed
         if (playground.errorMessage != null)
           Container(
